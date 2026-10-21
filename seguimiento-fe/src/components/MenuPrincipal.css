@@ -1,0 +1,32 @@
+.titulo-menu {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--guatemala-blue);
+}
+
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;   
+  gap: 25px;                 
+  margin-bottom: 30px;
+}
+
+.menu-card {
+  background: #4997d0;
+  border: 1px solid #d0e3f5;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  width: 200px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-card:hover {
+  background: #003366;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

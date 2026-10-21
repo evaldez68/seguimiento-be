@@ -1,0 +1,23 @@
+id,nombre,correo,contrasena,rol_id,activo,fecha_registro
+3,Alta Verapaz,averapaz@mides.gob.gt,averapaz$26,2,true,20/10/2026
+4,Baja Verapaz,bverapaz@mides.gob.gt,bverapaz$26,2,true,20/10/2026
+5,Chimaltenango,chimaltenango@mides.gob.gt,chimal$26,2,true,20/10/2026
+6,Chiquimula,chiquimula@mides.gob.gt,chiquimula$26,2,true,20/10/2026
+7,El Progreso,progreso@mides.gob.gt,progreso$26,2,true,20/10/2026
+8,Escuintla,escuintla@mides.gob.gt,escuintla$26,2,true,20/10/2026
+9,Guatemala,guatemala@mides.gob.gt,guate$26,2,true,20/10/2026
+10,Huehuetenango,huehuetenango@mides.gob.gt,huehue$26,2,true,20/10/2026
+11,Izabal,izabal@mides.gob.gt,izabal$26,2,true,20/10/2026
+12,Jalapa,jalapa@mides.gob.gt,jalapa$26,2,true,20/10/2026
+13,Jutiapa,jutiapa@mides.gob.gt,jutiapa$26,2,true,20/10/2026
+14,Peten,peten@mides.gob.gt,peten$26,2,true,20/10/2026
+15,Quetzaltenango,xela@mides.gob.gt,xela$26,2,true,20/10/2026
+16,Quiche,quiche@mides.gob.gt,quiche$26,2,true,20/10/2026
+17,Retalhuleu,retalhuleu@mides.gob.gt,retalhuleu$26,2,true,20/10/2026
+18,Sacatepequez,sacatepequez@mides.gob.gt,antigua$26,2,true,20/10/2026
+19,San Marcos,smarcos@mides.gob.gt,smarcos$26,2,true,20/10/2026
+20,Santa Rosa,srosa@mides.gob.gt,srosa$26,2,true,20/10/2026
+21,Solola,solola@mides.gob.gt,solola$26,2,true,20/10/2026
+22,Suchitepequez,suchitepequez@mides.gob.gt,mazate$26,2,true,20/10/2026
+23,Totonicapan,totonicapan@mides.gob.gt,toto$26,2,true,20/10/2026
+24,Zacapa,zacapa@mides.gob.gt,zacapa$26,2,true,20/10/2026

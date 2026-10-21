@@ -1,0 +1,735 @@
+// routes/seguimiento_documentos.js
+
+import express from 'express';
+import supabase from '../db.js';
+
+const router = express.Router();
+
+// GET: listar seguimiento con joins completos
+router.get('/', async (req, res) => {
+  const { data, error } = await supabase
+    .from('seguimiento_documentos')
+    .select(`
+      id,
+      usuario,
+      fecha,
+      hora,
+      recibido,
+      procesos ( nombre ),
+      detalle_envios ( tipo_documento, numero_documento, programa, subprograma ),
+      maestro_envios ( correlativo, tipo_entrega, no_guia, empresa_courier )
+    `);
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+// POST: insertar nuevo seguimiento
+router.post('/', async (req, res) => {
+  const { id_envio, id_proceso, id_documento, usuario, recibido } = req.body;
+
+  const { data, error } = await supabase
+    .from('seguimiento_documentos')
+    .insert([{
+      id_envio,
+      id_proceso,
+      id_documento,
+      usuario,
+      recibido
+    }]);
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+// PUT: actualizar seguimiento existente
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { recibido } = req.body;
+
+  const { data, error } = await supabase
+    .from('seguimiento_documentos')
+    .update({ recibido })
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+// DELETE: eliminar registro de seguimiento
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from('seguimiento_documentos')
+    .delete()
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+export default router;
+
+// routes/maestro_envios.js
+
+import express from 'express';
+import supabase from '../db.js';
+
+const router = express.Router();
+
+// GET: listar todos los envíos
+router.get('/', async (req, res) => {
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .select('*,coordinaciones_departamentales(departamento,coordinador,direccion_fisica,contacto)')
+    .order('fecha', { ascending: false });
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// GET: obtener último correlativo
+router.get('/ultimo-correlativo', async (req, res) => {
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .select('correlativo')
+    .order('correlativo', { ascending: false })
+    .limit(1);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  const ultimo = data.length > 0 ? data[0].correlativo : 0;
+  res.json({ ultimo, siguiente: ultimo + 1 });
+});
+
+// GET: obtener un envío por id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .select('*,coordinaciones_departamentales(departamento,coordinador,direccion_fisica,contacto)')
+    .eq('id', id)
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+
+// POST: crear un nuevo envío
+router.post('/', async (req, res) => {
+  const { id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora } = req.body;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .insert([{ id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora }])
+    .select(`*,coordinaciones_departamentales(departamento,coordinador,direccion_fisica,contacto)`);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(201).json(data[0]);
+});
+
+// PUT: actualizar un envío por id
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora } = req.body;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .update({ id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora })
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// DELETE: eliminar un envío por id
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .delete()
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ message: 'Envío eliminado', data });
+});
+
+export default router;
+
+// routes/detalle_envios.js
+import express from 'express';
+import supabase from '../db.js';
+
+const router = express.Router();
+
+// GET: listar todos los detalles de envíos
+router.get('/', async (req, res) => {
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// GET: obtener un detalle por id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// POST: crear un nuevo detalle de envío
+router.post('/', async (req, res) => {
+  const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma } = req.body;
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .insert([{ id_maestro_envio, tipo_documento, numero_documento, programa, subprograma }]);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(201).json(data);
+});
+
+// PUT: actualizar un detalle por id
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma } = req.body;
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .update({ id_maestro_envio, tipo_documento, numero_documento, programa, subprograma })
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// DELETE: eliminar un detalle por id
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .delete()
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ message: 'Detalle eliminado', data });
+});
+
+export default router;
+
+// src/components/SeguimientoEnvios.jsx
+import React, { useState } from "react";
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Checkbox, Button, TextField
+} from "@mui/material";
+
+function SeguimientoEnvios() {
+  const [correlativo, setCorrelativo] = useState("");
+  const [maestro, setMaestro] = useState(null);
+  const [documentos, setDocumentos] = useState([]);
+  const [seleccionados, setSeleccionados] = useState([]);
+
+  // Buscar correlativo y cargar datos
+  const buscarEnvio = async () => {
+    try {
+      const resMaestro = await fetch(`http://localhost:3000/maestro_envios/correlativo/${correlativo}`);
+      const maestroData = await resMaestro.json();
+      setMaestro(maestroData);
+
+      const resDocs = await fetch(`http://localhost:3000/detalle_envios/correlativo/${correlativo}`);
+      const docsData = await resDocs.json();
+      setDocumentos(docsData);
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al buscar envío:", err);
+    }
+  };
+
+  // Marcar/desmarcar checkbox
+  const toggleCheckbox = (id) => {
+    setSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // Grabar seguimiento
+  const grabarSeguimiento = async () => {
+    try {
+      const payload = seleccionados.map((idDoc) => ({
+        id_envio: maestro.id,
+        id_proceso: maestro.id_proceso,
+        id_documento: idDoc,
+        usuario: "avaldez", // puedes reemplazar por usuario logueado
+        recibido: true,
+      }));
+      
+      console.log("Payload a enviar:", payload);
+      await fetch("http://localhost:3000/seguimiento_documentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      alert("Seguimiento grabado correctamente ✅");
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al grabar seguimiento:", err);
+    }
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Seguimiento de Envíos</h2>
+
+      {/* Buscar correlativo */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <TextField
+          label="Correlativo del envío"
+          variant="outlined"
+          value={correlativo}
+          onChange={(e) => setCorrelativo(e.target.value)}
+        />
+        <Button variant="contained" onClick={buscarEnvio}>
+          Buscar
+        </Button>
+      </div>
+
+      {/* Maestro Envios */}
+      {maestro && (
+        <Paper sx={{ padding: 2, marginBottom: 2 }}>
+          <h3>Datos del Envío</h3>
+          <p><strong>Correlativo:</strong> {maestro.correlativo}</p>
+          <p><strong>Tipo de Entrega:</strong> {maestro.tipo_entrega}</p>
+          <p><strong>No. de Guía:</strong> {maestro.no_guia}</p>
+          <p><strong>Empresa Courier:</strong> {maestro.empresa_courier}</p>
+        </Paper>
+      )}
+
+      {/* Grid de Documentos */}
+      {documentos.length > 0 && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Tipo de Documento</TableCell>
+                <TableCell>Número de Documento</TableCell>
+                <TableCell>Programa</TableCell>
+                <TableCell>Subprograma</TableCell>
+                <TableCell align="center">Recibido</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {documentos.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell>{doc.tipo_documento}</TableCell>
+                  <TableCell>{doc.numero_documento}</TableCell>
+                  <TableCell>{doc.programa}</TableCell>
+                  <TableCell>{doc.subprograma}</TableCell>
+                  <TableCell align="center">
+                    <Checkbox
+                      checked={seleccionados.includes(doc.id)}
+                      onChange={() => toggleCheckbox(doc.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Botón Grabar */}
+      {documentos.length > 0 && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={grabarSeguimiento}>
+            Grabar
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default SeguimientoEnvios;
+
+11:30AM 
+
+// src/components/SeguimientoEnvios.jsx
+import React, { useState, useEffect } from "react";
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Checkbox, Button, TextField, Select, MenuItem
+} from "@mui/material";
+
+function SeguimientoEnvios() {
+  const [correlativo, setCorrelativo] = useState("");
+  const [maestro, setMaestro] = useState(null);
+  const [documentos, setDocumentos] = useState([]);
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [procesos, setProcesos] = useState([]); // 👈 lista de procesos desde backend
+  const [idProcesoSeleccionado, setIdProcesoSeleccionado] = useState("");
+
+  // Cargar procesos al iniciar
+  useEffect(() => {
+    const cargarProcesos = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/procesos");
+        const data = await res.json();
+        setProcesos(data);
+      } catch (err) {
+        console.error("Error al cargar procesos:", err);
+      }
+    };
+    cargarProcesos();
+  }, []);
+
+  // Buscar correlativo y cargar datos
+  const buscarEnvio = async () => {
+    try {
+      const resMaestro = await fetch(`http://localhost:3000/maestro_envios/correlativo/${correlativo}`);
+      const maestroData = await resMaestro.json();
+      setMaestro(maestroData);
+
+      const resDocs = await fetch(`http://localhost:3000/detalle_envios/correlativo/${correlativo}`);
+      const docsData = await resDocs.json();
+      setDocumentos(docsData);
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al buscar envío:", err);
+    }
+  };
+
+  // Marcar/desmarcar checkbox
+  const toggleCheckbox = (id) => {
+    setSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // Grabar seguimiento
+  const grabarSeguimiento = async () => {
+    if (!idProcesoSeleccionado) {
+      alert("Debe seleccionar un proceso antes de grabar ❌");
+      return;
+    }
+
+    try {
+      const payload = seleccionados.map((idDoc) => ({
+        id_envio: maestro.id,
+        id_proceso: parseInt(idProcesoSeleccionado), // 👈 ahora viene del Select
+        id_documento: idDoc,
+        usuario: "avaldez", // puedes reemplazar por usuario logueado
+        recibido: true,
+      }));
+      
+      console.log("Payload a enviar:", payload);
+      await fetch("http://localhost:3000/seguimiento_documentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      alert("Seguimiento grabado correctamente ✅");
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al grabar seguimiento:", err);
+    }
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Seguimiento de Envíos</h2>
+
+      {/* Buscar correlativo */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <TextField
+          label="Correlativo del envío"
+          variant="outlined"
+          value={correlativo}
+          onChange={(e) => setCorrelativo(e.target.value)}
+        />
+        <Button variant="contained" onClick={buscarEnvio}>
+          Buscar
+        </Button>
+      </div>
+
+      {/* Maestro Envios */}
+      {maestro && (
+        <Paper sx={{ padding: 2, marginBottom: 2 }}>
+          <h3>Datos del Envío</h3>
+          <p><strong>Correlativo:</strong> {maestro.correlativo}</p>
+          <p><strong>Tipo de Entrega:</strong> {maestro.tipo_entrega}</p>
+          <p><strong>No. de Guía:</strong> {maestro.no_guia}</p>
+          <p><strong>Empresa Courier:</strong> {maestro.empresa_courier}</p>
+        </Paper>
+      )}
+
+      {/* Select de Proceso */}
+      {maestro && (
+        <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+          <h3>Seleccione Proceso</h3>
+          <Select
+            value={idProcesoSeleccionado}
+            onChange={(e) => setIdProcesoSeleccionado(e.target.value)}
+            displayEmpty
+            style={{ width: "500px" }} // 👈 ancho fijo más compacto            
+          >
+            <MenuItem value="">
+              <em>-- Seleccione --</em>
+            </MenuItem>
+            {procesos.map((p) => (
+              <MenuItem key={p.id} value={p.id}>
+                {p.nombre_proceso} - {p.encargado} {/* 👈 mostrar nombre y encargado */}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      )}
+
+      {/* Grid de Documentos */}
+      {documentos.length > 0 && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Tipo de Documento</TableCell>
+                <TableCell>Número de Documento</TableCell>
+                <TableCell>Programa</TableCell>
+                <TableCell>Subprograma</TableCell>
+                <TableCell align="center">Recibido</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {documentos.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell>{doc.tipo_documento}</TableCell>
+                  <TableCell>{doc.numero_documento}</TableCell>
+                  <TableCell>{doc.programa}</TableCell>
+                  <TableCell>{doc.subprograma}</TableCell>
+                  <TableCell align="center">
+                    <Checkbox
+                      checked={seleccionados.includes(doc.id)}
+                      onChange={() => toggleCheckbox(doc.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+
+      {/* Botón Grabar */}
+      {documentos.length > 0 && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={grabarSeguimiento}>
+            Grabar
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default SeguimientoEnvios;
+
+14:35
+
+// src/components/SeguimientoEnvios.jsx
+import React, { useState, useEffect } from "react";
+import {
+  Grid, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Checkbox, Button, TextField, Select, MenuItem
+} from "@mui/material";
+
+function SeguimientoEnvios() {
+  const [correlativo, setCorrelativo] = useState("");
+  const [maestro, setMaestro] = useState(null);
+  const [documentos, setDocumentos] = useState([]);
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [procesos, setProcesos] = useState([]);
+  const [idProcesoSeleccionado, setIdProcesoSeleccionado] = useState("");
+
+  // Función para formatear fecha dd/mm/yyyy
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return "";
+      const fecha = new Date(fechaStr);
+      const dia = String(fecha.getDate() + 1).padStart(2, "0");
+      const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+      const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+  };
+
+  // Cargar procesos al iniciar
+  useEffect(() => {
+    const cargarProcesos = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/procesos");
+        const data = await res.json();
+        setProcesos(data);
+      } catch (err) {
+        console.error("Error al cargar procesos:", err);
+      }
+    };
+    cargarProcesos();
+  }, []);
+
+  // Buscar correlativo y cargar datos
+  const buscarEnvio = async () => {
+    try {
+      const resMaestro = await fetch(`http://localhost:3000/maestro_envios/correlativo/${correlativo}`);
+      const maestroData = await resMaestro.json();
+      setMaestro(maestroData);
+
+      const resDocs = await fetch(`http://localhost:3000/detalle_envios/correlativo/${correlativo}`);
+      const docsData = await resDocs.json();
+      setDocumentos(docsData);
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al buscar envío:", err);
+    }
+  };
+
+  // Marcar/desmarcar checkbox
+  const toggleCheckbox = (id) => {
+    setSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // Grabar seguimiento
+  const grabarSeguimiento = async () => {
+    if (!idProcesoSeleccionado) {
+      alert("Debe seleccionar un proceso antes de grabar ❌");
+      return;
+    }
+
+    try {
+      const payload = seleccionados.map((idDoc) => ({
+        id_envio: maestro.id,
+        id_proceso: parseInt(idProcesoSeleccionado),
+        id_documento: idDoc,
+        usuario: "avaldez",
+        recibido: true,
+      }));
+      
+      {/*console.log("Payload a enviar:", payload);*/}
+      await fetch("http://localhost:3000/seguimiento_documentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      alert("Seguimiento grabado correctamente ✅");
+      setSeleccionados([]);
+    } catch (err) {
+      console.error("Error al grabar seguimiento:", err);
+    }
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Seguimiento de Envíos</h2>
+
+      {/* Fila con correlativo, botón y select */}
+      <Grid container spacing={2} alignItems="center" marginBottom={2}>
+        <Grid item xs={5}>
+          <TextField
+            label="Correlativo del envío"
+            variant="outlined"
+            value={correlativo}
+            onChange={(e) => setCorrelativo(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Button variant="contained" onClick={buscarEnvio} fullWidth>
+            Buscar
+          </Button>
+        </Grid>
+        <Grid item xs={5}>
+          <Select
+            value={idProcesoSeleccionado}
+            onChange={(e) => setIdProcesoSeleccionado(e.target.value)}
+            displayEmpty
+            fullWidth
+          >
+            <MenuItem value="">
+              <em>-- Seleccione Proceso --</em>
+            </MenuItem>
+            {procesos.map((p) => (
+              <MenuItem key={p.id} value={p.id}>
+                {p.nombre_proceso} - {p.encargado}
+              </MenuItem>
+            ))}
+          </Select>
+        </Grid>
+      </Grid>
+
+      {/* Maestro Envios */}
+      {maestro && (
+        <Paper sx={{ padding: 2, marginBottom: 2, alignItems: "left" }}>
+          <h3>Datos del Envío</h3>
+          <p><strong>Correlativo:</strong> {maestro.correlativo}</p>
+          <p><strong>Tipo de Entrega:</strong> {maestro.tipo_entrega}</p>
+          <p><strong>No. de Guía:</strong> {maestro.no_guia}</p>
+          <p><strong>Empresa Courier:</strong> {maestro.empresa_courier}</p>
+          <p><strong>Fecha del Envío:</strong> {formatearFecha(maestro.fecha)} - {maestro.hora}</p>
+        </Paper>
+      )}
+
+      {/* Grid de Documentos */}
+      {documentos.length > 0 && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Tipo de Documento</TableCell>
+                <TableCell>Número de Documento</TableCell>
+                <TableCell>Programa</TableCell>
+                <TableCell>Subprograma</TableCell>
+                <TableCell align="center">Recibido</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {documentos.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell>{doc.tipo_documento}</TableCell>
+                  <TableCell>{doc.numero_documento}</TableCell>
+                  <TableCell>{doc.programa}</TableCell>
+                  <TableCell>{doc.subprograma}</TableCell>
+                  <TableCell align="center">
+                    <Checkbox
+                      checked={seleccionados.includes(doc.id)}
+                      onChange={() => toggleCheckbox(doc.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Botón Grabar */}
+      {documentos.length > 0 && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={grabarSeguimiento}>
+            Grabar
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default SeguimientoEnvios;

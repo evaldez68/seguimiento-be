@@ -1,0 +1,336 @@
+// scr/components/EnviosProceso.jsx
+
+import React, { useState } from "react";
+import MaestroEnvioForm from "./MaestroEnvioForm";
+import DetalleEnvioGrid from "./DetalleEnvioGrid";
+import { generarNotaTraslado } from "./NotaTrasladoPDF";
+
+function EnviosProceso() {
+  const [idMaestro, setIdMaestro] = useState(null);
+  const [maestro, setMaestro] = useState({});
+  const [detalle, setDetalle] = useState([]);
+
+  const handleGrabarMaestro = (data) => {
+    if (data && data.id) {
+      setMaestro(data);
+      setIdMaestro(data.id);
+    } else {
+      console.error("El objeto maestro no trae id:", data);
+    }
+  };
+
+  return (
+    <div className="contenedor-envios">
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+        Ingreso de Envíos
+      </h2>
+
+      <MaestroEnvioForm onGrabar={handleGrabarMaestro} />
+
+      {idMaestro && (
+        <>
+          <DetalleEnvioGrid idMaestro={idMaestro} onChange={setDetalle} />
+
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <button
+              onClick={() => generarNotaTraslado(maestro, detalle)}
+              className="btn-pdf"
+              style={{
+                backgroundColor: "#4997D0",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Generar Nota de Traslado
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default EnviosProceso;
+
+// scr/components/DetalleEnvioGrid.jsx
+
+import React, { useState, useEffect } from "react";
+
+function DetalleEnvioGrid({ idMaestro, onChange }) {
+  const [detalle, setDetalle] = useState([]);
+  const [programas, setProgramas] = useState([]);
+  const [subprogramas, setSubprogramas] = useState([]);
+  const [nuevo, setNuevo] = useState({
+    tipo_documento: "",
+    numero_documento: "",
+    programa: "",
+    subprograma: "",
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:3000/programas")
+      .then((res) => res.json())
+      .then((data) => setProgramas(data));
+
+    fetch("http://localhost:3000/subprogramas")
+      .then((res) => res.json())
+      .then((data) => setSubprogramas(data));
+
+    if (idMaestro) {
+      cargarDetalle();
+    }
+  }, [idMaestro]);
+
+  const cargarDetalle = async () => {
+    const res = await fetch("http://localhost:3000/detalle_envios");
+    const data = await res.json();
+    const filtrados = data.filter((d) => d.id_maestro_envio === idMaestro);
+    setDetalle(filtrados);
+    if (onChange) onChange(filtrados); // enviamos al padre
+  };
+
+  const handleChange = (e) => {
+    setNuevo({ ...nuevo, [e.target.name]: e.target.value });
+  };
+
+  const agregarDetalle = async () => {
+    const payload = { ...nuevo, id_maestro_envio: idMaestro };
+    await fetch("http://localhost:3000/detalle_envios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    await cargarDetalle();
+    setNuevo({ tipo_documento: "", numero_documento: "", programa: "", subprograma: "" });
+  };
+
+  return (
+    <div>
+      <h3>Detalle de Documentos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo Documento</th>
+            <th>Número Documento</th>
+            <th>Programa</th>
+            <th>Subprograma</th>
+          </tr>
+        </thead>
+        <tbody>
+          {detalle.map((d, i) => (
+            <tr key={i}>
+              <td>{d.tipo_documento}</td>
+              <td>{d.numero_documento}</td>
+              <td>{d.programa}</td>
+              <td>{d.subprograma}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="formulario-detalle">
+        <input
+          type="text"
+          name="tipo_documento"
+          placeholder="Tipo Documento"
+          value={nuevo.tipo_documento}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="numero_documento"
+          placeholder="Número Documento"
+          value={nuevo.numero_documento}
+          onChange={handleChange}
+        />
+        <select name="programa" value={nuevo.programa} onChange={handleChange}>
+          <option value="">Seleccione Programa</option>
+          {programas.map((p) => (
+            <option key={p.id} value={p.nombre_programa}>
+              {p.nombre_programa}
+            </option>
+          ))}
+        </select>
+        <select name="subprograma" value={nuevo.subprograma} onChange={handleChange}>
+          <option value="">Seleccione Subprograma</option>
+          {subprogramas.map((s) => (
+            <option key={s.id} value={s.nombre}>
+              {s.nombre}
+            </option>
+          ))}
+        </select>
+        <button onClick={agregarDetalle}>Agregar</button>
+      </div>
+    </div>
+  );
+}
+
+export default DetalleEnvioGrid;
+
+// src/components/MaestroEnvioForm.jsx
+import React, { useState, useEffect } from "react";
+
+function MaestroEnvioForm({ onGrabar }) {
+  const [formData, setFormData] = useState({
+    id_coordinacion: "",
+    correlativo: "",
+    tipo_entrega: "Presencial",
+    no_guia: "",
+    empresa_courier: "",
+  });
+
+  const [coordinaciones, setCoordinaciones] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/coordinaciones")
+      .then((res) => res.json())
+      .then((data) => setCoordinaciones(data));
+
+    // Generar correlativo automáticamente
+    fetch("http://localhost:3000/maestro_envios")
+      .then((res) => res.json())
+      .then((data) => {
+        const ultimo = data.length > 0 ? data[data.length - 1].correlativo : 0;
+        setFormData((prev) => ({ ...prev, correlativo: parseInt(ultimo) + 1 }));
+      });
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const fecha = new Date();
+    const payload = {
+      ...formData,
+      fecha: fecha.toISOString().split("T")[0],
+      hora: fecha.toTimeString().split(" ")[0],
+    };
+
+    const res = await fetch("http://localhost:3000/maestro_envios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    console.log("Maestro creado:", data); // 👈 confirmamos que trae todos los campos
+    onGrabar(data); // devolvemos el objeto creado con su id y demás datos
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="formulario">
+      <h3>Ingreso Maestro de Envío</h3>
+
+      <label>Coordinación:</label>
+      <select
+        name="id_coordinacion"
+        value={formData.id_coordinacion}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Seleccione coordinación</option>
+        {coordinaciones.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.departamento}
+          </option>
+        ))}
+      </select>
+
+      <label>Correlativo:</label>
+      <input type="text" name="correlativo" value={formData.correlativo} readOnly />
+
+      <label>Tipo de Entrega:</label>
+      <select name="tipo_entrega" value={formData.tipo_entrega} onChange={handleChange}>
+        <option value="Presencial">Presencial</option>
+        <option value="Courrier">Courrier</option>
+      </select>
+
+      {formData.tipo_entrega === "Courrier" && (
+        <>
+          <label>No. Guía:</label>
+          <input type="text" name="no_guia" value={formData.no_guia} onChange={handleChange} />
+          <label>Empresa Courier:</label>
+          <input type="text" name="empresa_courier" value={formData.empresa_courier} onChange={handleChange} />
+        </>
+      )}
+
+      <button type="submit" className="guardar">Grabar</button>
+    </form>
+  );
+}
+
+export default MaestroEnvioForm;
+
+// routes/maestro_envios.js
+
+import express from 'express';
+import supabase from '../db.js';
+
+const router = express.Router();
+
+// GET: listar todos los envíos
+router.get('/', async (req, res) => {
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .select('*')
+    .order('fecha', { ascending: false });
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// GET: obtener un envío por id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .select('*,coordinaciones_departamentales(departamento,coordinador,direccion_fisica,contacto)')
+    .eq('id', id)
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// POST: crear un nuevo envío
+router.post('/', async (req, res) => {
+  const { id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora } = req.body;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .insert([{ id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora }])
+    .select(`*,coordinaciones_departamentales(departamento,coordinador,direccion_fisica,contacto)`); // 👈 esto hace que Supabase devuelva el registro insertado 
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(201).json(data[0]); // 👈 enviamos solo el objeto creado
+});
+
+// PUT: actualizar un envío por id
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora } = req.body;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .update({ id_coordinacion, correlativo, tipo_entrega, no_guia, empresa_courier, fecha, hora })
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// DELETE: eliminar un envío por id
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('maestro_envios')
+    .delete()
+    .eq('id', id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ message: 'Envío eliminado', data });
+});
+
+export default router;

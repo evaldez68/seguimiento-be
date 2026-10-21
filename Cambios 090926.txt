@@ -1,0 +1,57 @@
+// src/components/MenuPrincipal.jsx
+import React from "react";
+
+function MenuPrincipal({ setVista, usuario }) {
+  return (
+    <div className="contenedor-principal">
+      <h2 style={{ textAlign: "center", marginBottom: "20px", color: "var(--guatemala-blue)" }}>
+        Menú Principal
+      </h2>
+
+      {/* Sección Ingreso Maestros */}
+      <h3>Ingreso Maestros</h3>
+      <div className="menu-grid" style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginBottom: "20px", justifyContent: "center" }}>
+        <button onClick={() => setVista("procesos")} className="menu-boton">Procesos</button>
+        <button onClick={() => setVista("coordinaciones")} className="menu-boton">Coordinaciones</button>
+
+        {/* 👇 Solo Administrador ve Usuarios y Roles */}
+        {usuario?.rol === "Administrador" && (
+          <>
+            <button onClick={() => setVista("usuarios")} className="menu-boton">Usuarios</button>
+            <button onClick={() => setVista("roles")} className="menu-boton">Roles</button>
+          </>
+        )}
+
+        <button onClick={() => setVista("programas")} className="menu-boton">Programas</button>
+        <button onClick={() => setVista("subprogramas")} className="menu-boton">Subprogramas</button>
+      </div>
+
+      {/* Sección Seguimiento Documentos */}
+      <h3>Seguimiento Documentos</h3>
+      <div className="menu-grid" style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginBottom: "20px", justifyContent: "center" }}>
+        <button onClick={() => setVista("envios")} className="menu-boton">Ingreso de Envíos</button>
+        <button onClick={() => setVista("seguimiento")} className="menu-boton">Seguimiento de Envíos</button>
+      </div>
+
+      {/* Sección Seguimiento Expedientes */}
+      <h3>Seguimiento Expedientes</h3>
+      <div className="menu-grid" style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginBottom: "20px", justifyContent: "center" }}>
+        <button onClick={() => setVista("cargaExpedientes")} className="menu-boton">Carga de Expedientes</button>
+        <button onClick={() => setVista("expedientesCoordinacion")} className="menu-boton">Expedientes Coordinación</button>
+      </div>
+      <div className="menu-grid" style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginBottom: "20px", justifyContent: "center" }}>
+        <button onClick={() => setVista("actualizarExpedientes")} className="menu-boton">Actualizar Expedientes</button>
+        <button onClick={() => setVista("trasladoExpediente")} className="menu-boton">Traslado de Expedientes</button> 
+        <button onClick={() => setVista("recepcionExpediente")} className="menu-boton">Recepción de Expedientes</button>
+      </div>
+
+      {/* Sección Dashboard */}
+      <h3>Dashboard</h3>
+      <div className="menu-grid">
+        <button onClick={() => setVista("dashboard")} className="menu-boton">Dashboard</button>
+      </div>
+    </div>
+  );
+}
+
+export default MenuPrincipal;

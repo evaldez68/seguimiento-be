@@ -1,0 +1,13 @@
+id,id_programa,nombre,encargado,piso_entrega
+1,1,Bono Salud,DCO Tecnica,4to Piso
+2,1,Bono Social,DCO Tecnica,4to Piso
+3,2,Bolsa Social,DCO Tecnica,4to Piso
+4,3,Comedor Social,DCO Tecnica,4to Piso
+5,4,Beca Social de Capacitacion Productiva,DCO Tecnica,4to Piso
+6,5,Jovenes Protagonistas,DCO Tecnica,4to Piso
+7,6,Intervencion Bono Nutricion,DCO Tecnica,4to Piso
+8,7,Beca Social de Educacion Media,DCO Tecnica,4to Piso
+9,8,Beca Social de Educacion Superior,DCO Tecnica,4to Piso
+10,9,Programa Vida,DCO Tecnica,4to Piso
+11,10,Otros Programas,DCO Tecnica,4to Piso
+12,11,Casos Judicializados,DCO Tecnica,4to Piso

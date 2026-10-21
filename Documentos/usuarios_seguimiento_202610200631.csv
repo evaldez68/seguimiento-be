@@ -1,0 +1,3 @@
+"id","nombre","correo","contrasena","rol_id","activo","fecha_registro"
+1,Edwin Valdez,edwin@test.com,dwnvz01,1,true,2026-08-10 20:57:25.579
+2,Juan Perez,jperez@test.com,Prueba1$,2,true,2026-08-10 21:30:13.111
