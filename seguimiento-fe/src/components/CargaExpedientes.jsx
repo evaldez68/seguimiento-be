@@ -36,7 +36,7 @@ const CargaExpedientes = () => {
 
     try {
       // 1️⃣ Obtener nuevo id_carga antes de procesar
-      const respId = await fetch("http://localhost:3000/expedientes_batch/next-id");
+      const respId = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes_batch/next-id");
       const { nuevoId } = await respId.json();
 
       const data = await file.arrayBuffer();
@@ -97,7 +97,7 @@ const CargaExpedientes = () => {
         setMessage(`Procesando lote ${i/chunkSize+1} de ${totalChunks}...`);
         setProgress(Math.round(((i/chunkSize+1) / totalChunks) * 100));
 
-        const response = await fetch("http://localhost:3000/expedientes_batch/cargar-masivo", {
+        const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes_batch/cargar-masivo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(lote),

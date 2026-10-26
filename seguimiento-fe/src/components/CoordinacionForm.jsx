@@ -16,7 +16,7 @@ function CoordinacionForm({ onCoordinacionAgregada }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch("http://localhost:3000/coordinaciones", {
+      await fetch("http://seguimiento-be-production-7e17.up.railway.app/coordinaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

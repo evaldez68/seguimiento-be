@@ -14,7 +14,7 @@ function SubprogramaForm({ onSubprogramaAgregado }) {
 
   // Cargar programas para el select
   useEffect(() => {
-    fetch("http://localhost:3000/programas")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/programas")
       .then((res) => res.json())
       .then((data) => setProgramas(data))
       .catch((err) => console.error("Error cargando programas:", err));
@@ -27,7 +27,7 @@ function SubprogramaForm({ onSubprogramaAgregado }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/subprogramas", {
+      const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/subprogramas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

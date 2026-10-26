@@ -19,7 +19,7 @@ function CoordinacionesTable() {
   ];
 
   const cargarCoordinaciones = () => {
-    fetch("http://localhost:3000/coordinaciones")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/coordinaciones")
       .then((res) => res.json())
       .then((data) => setCoordinaciones(data))
       .catch((err) => console.error(err));
@@ -31,7 +31,7 @@ function CoordinacionesTable() {
 
   const eliminarCoordinacion = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar esta coordinación?")) {
-      await fetch(`http://localhost:3000/coordinaciones/${id}`, { method: "DELETE" });
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/coordinaciones/${id}`, { method: "DELETE" });
       setCoordinaciones(coordinaciones.filter((c) => c.id !== id));
     }
   };
@@ -39,7 +39,7 @@ function CoordinacionesTable() {
   const editarCoordinacion = async (id, campo, valorActual) => {
     const nuevoValor = prompt(`Ingrese el nuevo ${campo}:`, valorActual);
     if (nuevoValor) {
-      await fetch(`http://localhost:3000/coordinaciones/${id}`, {
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/coordinaciones/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [campo]: nuevoValor }),

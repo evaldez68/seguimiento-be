@@ -29,7 +29,7 @@ function ActualizarExpedientes({ usuario }) { // 👈 recibe usuario del login
   const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/departamentos")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/departamentos")
       .then((res) => res.json())
       .then((data) => setDepartamentos(data || []));
   }, []);
@@ -37,7 +37,7 @@ function ActualizarExpedientes({ usuario }) { // 👈 recibe usuario del login
   const handleDepartamentoChange = async (idDepartamento) => {
     setDepartamento(idDepartamento);
     setMunicipio("");
-    const res = await fetch(`http://localhost:3000/municipios/${idDepartamento}`);
+    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/municipios/${idDepartamento}`);
     const data = await res.json();
     setMunicipios(data || []);
   };
@@ -50,7 +50,7 @@ function ActualizarExpedientes({ usuario }) { // 👈 recibe usuario del login
 
     try {
       const nombreDepto = departamentos.find(d => d.id_departamento === departamento)?.nombre;
-      let url = `http://localhost:3000/expedientes/filtrar/${nombreDepto.toUpperCase()}`;
+      let url = `http://seguimiento-be-production-7e17.up.railway.app/expedientes/filtrar/${nombreDepto.toUpperCase()}`;
       if (municipio) {
         url += `/${municipio.toUpperCase()}`;
       }
@@ -98,7 +98,7 @@ function ActualizarExpedientes({ usuario }) { // 👈 recibe usuario del login
         nuevoEstatus: "Completo"
       };
 
-      const res = await fetch("http://localhost:3000/expedientes_estatus/actualizar-estatus", {
+      const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes_estatus/actualizar-estatus", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -121,7 +121,7 @@ function ActualizarExpedientes({ usuario }) { // 👈 recibe usuario del login
           updated_at: new Date().toISOString()
         }));
 
-        await fetch("http://localhost:3000/expedientes_seguimiento", {
+        await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes_seguimiento", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(inserts)

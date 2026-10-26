@@ -17,12 +17,12 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
 
   useEffect(() => {
     // 🔹 Cargar coordinaciones
-    fetch("http://localhost:3000/coordinaciones")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/coordinaciones")
       .then((res) => res.json())
       .then((data) => setCoordinaciones(data));
 
     // 🔹 Cargar couriers
-    fetch("http://localhost:3000/couriers")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/couriers")
       .then((res) => res.json())
       .then((data) => setCouriers(data));
 
@@ -31,7 +31,7 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
       setFormData((prev) => ({ ...prev, ...maestroInicial }));
     } else {
       // 🔹 Si es nueva nota, pedir correlativo al backend
-      fetch("http://localhost:3000/maestro_envios/ultimo-correlativo")
+      fetch("http://seguimiento-be-production-7e17.up.railway.app/maestro_envios/ultimo-correlativo")
         .then((res) => res.json())
         .then((info) => {
           setFormData((prev) => ({ ...prev, correlativo: info.siguiente }));
@@ -61,7 +61,7 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
       fecha: fecha.toISOString().split("T")[0],
       hora: fecha.toTimeString().split(" ")[0],
     };
-    const res = await fetch("http://localhost:3000/maestro_envios", {
+    const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/maestro_envios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

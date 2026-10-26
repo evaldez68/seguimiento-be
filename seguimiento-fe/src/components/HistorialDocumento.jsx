@@ -30,7 +30,7 @@ const HistorialDocumento = () => {
   // 🔹 Cargar lista de documentos únicos al montar
   useEffect(() => {
     const cargarDocumentos = async () => {
-      const res = await fetch(`http://localhost:3000/seguimiento_historial`);
+      const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/seguimiento_historial`);
       const data = await res.json();
       const unicos = [...new Set(data.map(d => d.numero_documento))];
       setListaDocs(unicos);
@@ -39,7 +39,7 @@ const HistorialDocumento = () => {
   }, []);
 
   const buscarHistorial = async (doc) => {
-    const res = await fetch(`http://localhost:3000/seguimiento_historial/historial/${doc}`);
+    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/seguimiento_historial/historial/${doc}`);
     const data = await res.json();
     setHistorial(data);
 

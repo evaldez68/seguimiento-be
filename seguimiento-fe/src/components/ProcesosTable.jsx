@@ -18,7 +18,7 @@ function ProcesosTable() {
   ];
 
   const cargarProcesos = () => {
-    fetch("http://localhost:3000/procesos")
+    fetch("http://seguimiento-be-production-7e17.up.railway.app/procesos")
       .then((res) => res.json())
       .then((data) => setProcesos(data))
       .catch((err) => console.error(err));
@@ -30,7 +30,7 @@ function ProcesosTable() {
 
   const eliminarProceso = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este proceso?")) {
-      await fetch(`http://localhost:3000/procesos/${id}`, { method: "DELETE" });
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/procesos/${id}`, { method: "DELETE" });
       setProcesos(procesos.filter((p) => p.id !== id));
     }
   };
@@ -38,7 +38,7 @@ function ProcesosTable() {
   const editarProceso = async (id, nombreActual) => {
     const nuevoNombre = prompt("Ingrese el nuevo nombre:", nombreActual);
     if (nuevoNombre) {
-      await fetch(`http://localhost:3000/procesos/${id}`, {
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/procesos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre_proceso: nuevoNombre }),

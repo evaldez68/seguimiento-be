@@ -8,7 +8,7 @@ function ProgramaForm({ onProgramaAgregado }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/programas", {
+      const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/programas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre_programa }),

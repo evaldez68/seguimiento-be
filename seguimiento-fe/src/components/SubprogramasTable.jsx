@@ -10,7 +10,7 @@ function SubprogramasTable() {
 
   const cargarSubprogramas = async () => {
     try {
-      const res = await fetch("http://localhost:3000/subprogramas");
+      const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/subprogramas");
       const data = await res.json();
       setSubprogramas(data);
     } catch (err) {
@@ -24,7 +24,7 @@ function SubprogramasTable() {
 
   const eliminarSubprograma = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este subprograma?")) {
-      await fetch(`http://localhost:3000/subprogramas/${id}`, { method: "DELETE" });
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/subprogramas/${id}`, { method: "DELETE" });
       setSubprogramas(subprogramas.filter((s) => s.id !== id));
     }
   };
@@ -32,7 +32,7 @@ function SubprogramasTable() {
   const editarSubprograma = async (id, valorActual) => {
     const nuevoNombre = prompt("Ingrese el nuevo nombre del subprograma:", valorActual);
     if (nuevoNombre) {
-      await fetch(`http://localhost:3000/subprogramas/${id}`, {
+      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/subprogramas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: nuevoNombre }),

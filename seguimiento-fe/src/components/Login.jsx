@@ -11,7 +11,7 @@ function Login({ onLoginExitoso }) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/usuarios_seguimiento/login", {
+      const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, contrasena }),

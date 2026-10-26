@@ -12,7 +12,7 @@ const CargaExpedientes = () => {
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
-        const res = await fetch("http://localhost:3000/coordinaciones");
+        const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/coordinaciones");
         const data = await res.json();
         setDepartamentos(data);
       } catch {
@@ -68,7 +68,7 @@ const CargaExpedientes = () => {
 
       let estatusMap = {};
       try {
-        const rubRes = await fetch("http://localhost:3000/expedientes/rub/batch", {
+        const rubRes = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/rub/batch", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ rubs }),
@@ -117,7 +117,7 @@ const CargaExpedientes = () => {
 
         console.log("Insertando expediente:", expediente);
 
-        const res = await fetch("http://localhost:3000/expedientes", {
+        const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(expediente),
