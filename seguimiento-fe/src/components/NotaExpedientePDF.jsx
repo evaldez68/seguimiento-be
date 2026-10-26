@@ -1,7 +1,7 @@
 // src/components/NotaExpedientePDF.jsx
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import logo from "../assets/LogoMides.png";
+import logo from "../assets/LogoMiDes.png";
 
 const fechaFormateada = new Date().toLocaleDateString("es-ES", {
   day: "2-digit",
