@@ -83,7 +83,7 @@ const CargaExpedientes = () => {
 
       console.log("JSON de carga:", registros);
 
-      const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/cargar", {
+      const response = await fetch("https://seguimiento-be-production-7e17.up.railway.app/expedientes/cargar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registros),

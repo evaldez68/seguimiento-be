@@ -21,7 +21,7 @@ function EnviosProceso() {
     setIdMaestro(null);
     setDetalle([]);
 
-    const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/maestro_envios/ultimo-correlativo");
+    const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/ultimo-correlativo");
     const info = await res.json();
 
     setMaestro({
@@ -40,7 +40,7 @@ function EnviosProceso() {
     }
 
     const resMaestro = await fetch(
-      `http://seguimiento-be-production-7e17.up.railway.app/maestro_envios/${buscarCorrelativo}`
+      `https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/${buscarCorrelativo}`
     );
     const maestroData = await resMaestro.json();
 
@@ -52,7 +52,7 @@ function EnviosProceso() {
     setMaestro(maestroData);
     setIdMaestro(maestroData.id);
 
-    const resDetalle = await fetch("http://seguimiento-be-production-7e17.up.railway.app/detalle_envios");
+    const resDetalle = await fetch("https://seguimiento-be-production-7e17.up.railway.app/detalle_envios");
     const detalleData = await resDetalle.json();
     const filtrados = detalleData.filter(
       (d) => d.id_maestro_envio === maestroData.id

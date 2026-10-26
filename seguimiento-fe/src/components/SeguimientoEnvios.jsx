@@ -37,7 +37,7 @@ function SeguimientoEnvios() {
   useEffect(() => {
     const cargarProcesos = async () => {
       try {
-        const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/procesos");
+        const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/procesos");
         const data = await res.json();
         setProcesos(data);
       } catch (err) {
@@ -55,7 +55,7 @@ function SeguimientoEnvios() {
     }
 
     try {
-      const resMaestro = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/maestro_envios/correlativo/${correlativo}`);
+      const resMaestro = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/correlativo/${correlativo}`);
       if (!resMaestro.ok) {
         mostrarMensaje("El correlativo no existe ❌", "error");
         setMaestro(null);
@@ -66,7 +66,7 @@ function SeguimientoEnvios() {
       }
       const maestroData = await resMaestro.json();
 
-      const resDocs = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/detalle_envios/correlativo/${correlativo}`);
+      const resDocs = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/detalle_envios/correlativo/${correlativo}`);
       const docsData = await resDocs.json();
 
       setMaestro(maestroData);
@@ -128,7 +128,7 @@ const grabarSeguimiento = async () => {
 
     console.log("Payload a enviar:", payload);
 
-    const resp = await fetch("http://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos", {
+    const resp = await fetch("https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

@@ -37,7 +37,7 @@ function TrasladoExpediente({ usuario }) {
   const [correlativo, setCorrelativo] = useState("");
 
   useEffect(() => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/departamentos")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/departamentos")
       .then((res) => res.json())
       .then((data) => setDepartamentos(data || []));
   }, []);
@@ -45,7 +45,7 @@ function TrasladoExpediente({ usuario }) {
   const handleDepartamentoChange = async (idDepartamento) => {
     setDepartamento(idDepartamento);
     setMunicipio("");
-    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/municipios/${idDepartamento}`);
+    const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/municipios/${idDepartamento}`);
     const data = await res.json();
     setMunicipios(data || []);
   };
@@ -58,7 +58,7 @@ function TrasladoExpediente({ usuario }) {
 
     try {
       const nombreDepto = departamentos.find(d => d.id_departamento === departamento)?.nombre;
-      let url = `http://seguimiento-be-production-7e17.up.railway.app/expedientes_traslado`;
+      let url = `https://seguimiento-be-production-7e17.up.railway.app/expedientes_traslado`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -97,7 +97,7 @@ function TrasladoExpediente({ usuario }) {
 
       // Actualizar expedientes_seguimiento
       for (const r of seleccionadosData) {
-        await fetch(`http://seguimiento-be-production-7e17.up.railway.app/expedientes_seguimiento/${r.id_carga}/${r.rub}`, {
+        await fetch(`https://seguimiento-be-production-7e17.up.railway.app/expedientes_seguimiento/${r.id_carga}/${r.rub}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

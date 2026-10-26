@@ -12,7 +12,7 @@ function ProcesoForm({ onProcesoAgregado }) {
     const nuevoProceso = { nombre_proceso: nombreProceso, encargado };
 
     try {
-      const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/procesos", {
+      const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/procesos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoProceso),

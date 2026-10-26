@@ -14,7 +14,7 @@ function UsuarioForm({ onUsuarioAgregado }) {
 
   // Cargar roles desde el backend
   useEffect(() => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento")
       .then((res) => res.json())
       .then((data) => setRoles(data))
       .catch((err) => console.error("Error cargando roles:", err));
@@ -29,7 +29,7 @@ function UsuarioForm({ onUsuarioAgregado }) {
     e.preventDefault();
     try {
       // Aquí sí grabamos en la tabla usuarios_seguimiento
-      const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento", {
+      const response = await fetch("https://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

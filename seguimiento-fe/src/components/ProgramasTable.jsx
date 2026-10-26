@@ -10,7 +10,7 @@ function ProgramasTable() {
 
   const cargarProgramas = async () => {
     try {
-      const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/programas");
+      const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/programas");
       const data = await res.json();
       setProgramas(data);
     } catch (err) {
@@ -24,7 +24,7 @@ function ProgramasTable() {
 
   const eliminarPrograma = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este programa?")) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/programas/${id}`, { method: "DELETE" });
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/programas/${id}`, { method: "DELETE" });
       setProgramas(programas.filter((p) => p.id !== id));
     }
   };
@@ -32,7 +32,7 @@ function ProgramasTable() {
   const editarPrograma = async (id, valorActual) => {
     const nuevoNombre = prompt("Ingrese el nuevo nombre del programa:", valorActual);
     if (nuevoNombre) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/programas/${id}`, {
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/programas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre_programa: nuevoNombre }),

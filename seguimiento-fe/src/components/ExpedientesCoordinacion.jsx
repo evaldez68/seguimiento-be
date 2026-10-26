@@ -27,11 +27,11 @@ function ExpedientesCoordinacion() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/departamentos")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/departamentos")
       .then(res => res.json())
       .then(data => setDepartamentos(data));
 
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/cargas")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/expedientes/cargas")
       .then(res => res.json())
       .then(data => setCargas(data));
   }, []);
@@ -40,7 +40,7 @@ function ExpedientesCoordinacion() {
     setDepartamento(idDepartamento);
     setMunicipio("");
     try {
-      const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/municipios/${idDepartamento}`);
+      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/municipios/${idDepartamento}`);
       const data = await res.json();
       setMunicipios(data || []);
     } catch (err) {
@@ -57,7 +57,7 @@ function ExpedientesCoordinacion() {
     setLoading(true);
     try {
       const nombreDepto = departamentos.find(d => d.id_departamento === departamento)?.nombre;
-      let url = `http://seguimiento-be-production-7e17.up.railway.app/expedientes/coordinacion/${idCarga}/${nombreDepto}`;
+      let url = `https://seguimiento-be-production-7e17.up.railway.app/expedientes/coordinacion/${idCarga}/${nombreDepto}`;
       if (municipio) {
         url += `/${municipio}`;
       }
@@ -82,7 +82,7 @@ function ExpedientesCoordinacion() {
     setLoading(true);
     try {
       const nombreDepto = departamentos.find(d => d.id_departamento === departamento)?.nombre;
-      let url = `http://seguimiento-be-production-7e17.up.railway.app/expedientes/rutas/${idCarga}/${nombreDepto}`;
+      let url = `https://seguimiento-be-production-7e17.up.railway.app/expedientes/rutas/${idCarga}/${nombreDepto}`;
       if (municipio) {
         url += `/${municipio}`;
       }

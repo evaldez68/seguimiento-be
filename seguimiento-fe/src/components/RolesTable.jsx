@@ -18,7 +18,7 @@ function RolesTable() {
   ];
 
   const cargarRoles = () => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento")
       .then((res) => res.json())
       .then((data) => setRoles(data))
       .catch((err) => console.error(err));
@@ -30,7 +30,7 @@ function RolesTable() {
 
   const eliminarRol = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este rol?")) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento/${id}`, { method: "DELETE" });
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento/${id}`, { method: "DELETE" });
       setRoles(roles.filter((r) => r.id !== id));
     }
   };
@@ -38,7 +38,7 @@ function RolesTable() {
   const editarRol = async (id, nombreActual) => {
     const nuevoNombre = prompt("Ingrese el nuevo nombre:", nombreActual);
     if (nuevoNombre) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento/${id}`, {
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: nuevoNombre }),

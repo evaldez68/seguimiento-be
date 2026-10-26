@@ -16,7 +16,7 @@ function TrasladoExpediente({ usuario }) {
   const [correlativo, setCorrelativo] = useState("");
 
   useEffect(() => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/notas_trasla")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/notas_trasla")
       .then((res) => res.json())
       .then((data) => setNotas(data || []));
   }, []);
@@ -32,7 +32,7 @@ function TrasladoExpediente({ usuario }) {
     }
 
     try {
-      let url = `http://seguimiento-be-production-7e17.up.railway.app/notas_trasla/expedientes/${nota}`;
+      let url = `https://seguimiento-be-production-7e17.up.railway.app/notas_trasla/expedientes/${nota}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -59,7 +59,7 @@ function TrasladoExpediente({ usuario }) {
       const seleccionadosData = rows.filter(r => seleccionados.includes(r.rub));
 
       for (const r of seleccionadosData) {
-        await fetch(`http://seguimiento-be-production-7e17.up.railway.app/notas_trasla/expediente_update/${r.nota_traslado}/${r.rub}`, {
+        await fetch(`https://seguimiento-be-production-7e17.up.railway.app/notas_trasla/expediente_update/${r.nota_traslado}/${r.rub}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ estatus: "Recibido" })

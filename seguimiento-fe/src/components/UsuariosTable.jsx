@@ -20,7 +20,7 @@ function UsuariosTable() {
   ];
 
   const cargarUsuarios = () => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento")
       .then((res) => res.json())
       .then((data) => setUsuarios(data))
       .catch((err) => console.error(err));
@@ -32,7 +32,7 @@ function UsuariosTable() {
 
   const eliminarUsuario = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este usuario?")) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento/${id}`, { method: "DELETE" });
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento/${id}`, { method: "DELETE" });
       setUsuarios(usuarios.filter((u) => u.id !== id));
     }
   };
@@ -40,7 +40,7 @@ function UsuariosTable() {
   const editarUsuario = async (id, campo, valorActual) => {
     const nuevoValor = prompt(`Ingrese el nuevo ${campo}:`, valorActual);
     if (nuevoValor) {
-      await fetch(`http://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento/${id}`, {
+      await fetch(`https://seguimiento-be-production-7e17.up.railway.app/usuarios_seguimiento/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [campo]: nuevoValor }),

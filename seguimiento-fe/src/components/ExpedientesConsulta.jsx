@@ -11,7 +11,7 @@ const ExpedientesConsulta = () => {
   const [rows, setRows] = useState([]);
 
   const buscarExpedientes = async () => {
-    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/expedientes/consulta?campo=${campo}&valor=${valor}`);
+    const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/expedientes/consulta?campo=${campo}&valor=${valor}`);
     const data = await res.json();
     setRows(data);
   };

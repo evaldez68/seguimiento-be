@@ -30,16 +30,16 @@ function Dashboard() {
 
   useEffect(() => {
     // carga inicial: resumen de cargas
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/resumen")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/expedientes/resumen")
       .then(res => res.json())
       .then(data => setResumenCargas(data));
     // carga inicial: todos los departamentos
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/deptos")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/expedientes/deptos")
       .then(res => res.json())
       .then(data => setExpedientesDepto(data));
 
     // carga inicial: todos los estatus
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus")
       .then(res => res.json())
       .then(data => setExpedientesEstatus(data));      
   }, []);
@@ -63,12 +63,12 @@ function Dashboard() {
       setIdCargaSeleccionada(carga);
 
       // fetch departamentos por carga
-      const resDepto = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/expedientes/deptos/${carga}`);
+      const resDepto = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/expedientes/deptos/${carga}`);
       const dataDepto = await resDepto.json();
       setExpedientesDepto(dataDepto);
 
       // fetch estatus por carga
-      const resEstatus = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus/${carga}`);
+      const resEstatus = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus/${carga}`);
       const dataEstatus = await resEstatus.json();
       setExpedientesEstatus(dataEstatus);
     },
@@ -92,7 +92,7 @@ function Dashboard() {
       const depto = dataDepto.labels[index];
 
       // fetch dinámico de estatus por departamento y carga
-      const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus_depto/${idCargaSeleccionada}/${depto}`);
+      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/expedientes/estatus_depto/${idCargaSeleccionada}/${depto}`);
       const data = await res.json();
       setExpedientesEstatus(data);
     },

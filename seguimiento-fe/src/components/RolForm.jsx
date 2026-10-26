@@ -15,7 +15,7 @@ function RolForm({ onRolAgregado }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento", {
+      const response = await fetch("https://seguimiento-be-production-7e17.up.railway.app/roles_seguimiento", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

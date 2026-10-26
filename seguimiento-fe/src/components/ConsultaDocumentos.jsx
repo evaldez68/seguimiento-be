@@ -25,13 +25,13 @@ const ConsultaDocumentos = () => {
   const [listaDocs, setListaDocs] = useState([]);
 
   const buscarPorDocumento = async (num) => {
-    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/seguimiento_consulta/documento/${num}`);
+    const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_consulta/documento/${num}`);
     const data = await res.json();
     setDocumentos(data);
   };
 
   const buscarPorCorrelativo = async () => {
-    const res = await fetch(`http://seguimiento-be-production-7e17.up.railway.app/seguimiento_consulta/correlativo/${correlativo}`);
+    const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_consulta/correlativo/${correlativo}`);
     const data = await res.json();
     setDocumentos(data);
 

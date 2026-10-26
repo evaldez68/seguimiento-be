@@ -13,11 +13,11 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
   });
 
   useEffect(() => {
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/programas")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/programas")
       .then((res) => res.json())
       .then((data) => setProgramas(data));
 
-    fetch("http://seguimiento-be-production-7e17.up.railway.app/subprogramas")
+    fetch("https://seguimiento-be-production-7e17.up.railway.app/subprogramas")
       .then((res) => res.json())
       .then((data) => setSubprogramas(data));
 
@@ -27,7 +27,7 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
   }, [idMaestro]);
 
   const cargarDetalle = async () => {
-    const res = await fetch("http://seguimiento-be-production-7e17.up.railway.app/detalle_envios");
+    const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/detalle_envios");
     const data = await res.json();
     const filtrados = data.filter((d) => d.id_maestro_envio === idMaestro);
     setDetalle(filtrados);
@@ -51,7 +51,7 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
     }
 
     const payload = { ...nuevo, id_maestro_envio: idMaestro };
-    await fetch("http://seguimiento-be-production-7e17.up.railway.app/detalle_envios", {
+    await fetch("https://seguimiento-be-production-7e17.up.railway.app/detalle_envios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
