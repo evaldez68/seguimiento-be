@@ -26,6 +26,7 @@ function MenuPrincipal({ setVista, usuario }) {
       <h3>Seguimiento Documentos</h3>
       <div className="menu-grid">
         <div className="menu-card" onClick={() => setVista("envios")}>Ingreso de Envíos</div>
+        <div className="menu-card" onClick={() => setVista("recepcionDCO")}>Recepción DCO</div>
         <div className="menu-card" onClick={() => setVista("seguimiento")}>Seguimiento de Envíos</div>
         <div className="menu-card" onClick={() => setVista("consultaDocumentos")}>Consulta de Documentos</div>
         <div className="menu-card" onClick={() => setVista("historialDocumento")}>Historial de Documento</div>

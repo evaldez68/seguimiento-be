@@ -6,7 +6,7 @@ import "./App.css";
 import logoMinisterio from "./assets/LogoMiDes.png";
 import Login from "./components/Login";
 import MenuPrincipal from "./components/MenuPrincipal";
-import MenuLateral from "./components/MenuLateral";
+//import MenuLateral from "./components/MenuLateral";
 import Dashboard from "./components/Dashboard";
 import ProcesosTable from "./components/ProcesosTable";
 import CoordinacionesTable from "./components/CoordinacionesTable";
@@ -24,6 +24,7 @@ import RecepcionExpediente from "./components/RecepcionExpediente";
 import ExpedientesConsulta from "./components/ExpedientesConsulta";
 import ConsultaDocumentos from "./components/ConsultaDocumentos";
 import HistorialDocumento from "./components/HistorialDocumento";
+import RecepcionDCO from "./components/RecepcionDCO";
 
 
 
@@ -136,6 +137,7 @@ function App() {
         {vista === "expedientesConsulta" && <ExpedientesConsulta />}
         {vista === "consultaDocumentos" && <ConsultaDocumentos />}
         {vista === "historialDocumento" && <HistorialDocumento />}
+        {vista === "recepcionDCO" && <RecepcionDCO />}
       </div>
     </div>
   );

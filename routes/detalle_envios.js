@@ -16,19 +16,6 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-// GET: obtener un detalle por id
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  const { data, error } = await supabase
-    .from('detalle_envios')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
-});
-
 // ⚡ NUEVO: obtener documentos por correlativo del maestro
 router.get('/correlativo/:correlativo', async (req, res) => {
   const { correlativo } = req.params;
@@ -54,12 +41,25 @@ router.get('/correlativo/:correlativo', async (req, res) => {
   res.json(data);
 });
 
+// GET: obtener un detalle por id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase
+    .from('detalle_envios')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
 // POST: crear un nuevo detalle de envío
 router.post('/', async (req, res) => {
   const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma } = req.body;
   const { data, error } = await supabase
     .from('detalle_envios')
-    .insert([{ id_maestro_envio, tipo_documento, numero_documento, programa, subprograma }]);
+    .insert([{id_maestro_envio,tipo_documento,numero_documento,programa,subprograma,estado: 'P',oficio_original: numero_documento}]);
 
   if (error) return res.status(400).json({ error: error.message });
   res.status(201).json(data);
@@ -68,10 +68,10 @@ router.post('/', async (req, res) => {
 // PUT: actualizar un detalle por id
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma } = req.body;
+  const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma, estado, oficio_original, descripcion } = req.body;
   const { data, error } = await supabase
     .from('detalle_envios')
-    .update({ id_maestro_envio, tipo_documento, numero_documento, programa, subprograma })
+    .update({ id_maestro_envio, tipo_documento, numero_documento, programa, subprograma, estado, oficio_original, descripcion })
     .eq('id', id);
 
   if (error) return res.status(400).json({ error: error.message });
