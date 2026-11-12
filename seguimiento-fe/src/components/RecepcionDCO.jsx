@@ -15,6 +15,7 @@ function RecepcionDCO() {
   const [snackbar, setSnackbar] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [severity, setSeverity] = useState("success");
+  const [iniciales, setIniciales] = useState("");
 
   useEffect(() => {
     fetch("https://seguimiento-be-production-7e17.up.railway.app/programas")
@@ -136,11 +137,16 @@ function RecepcionDCO() {
   const imprimirNota = () => {
 
     if (!notaTraslado) {
-      mostrarMensaje("Debe indicar una nota de traslado", "warning");
+      mostrarMensaje("Primero debe grabar una recepción", "warning");
       return;
     }
 
-    console.log("Imprimir Nota:", notaTraslado);
+    if (!iniciales) {
+      mostrarMensaje("Ingrese las iniciales", "warning");
+      return;
+    }
+
+    window.open(`https://seguimiento-be-production-7e17.up.railway.app/nota_traslado_docto/${notaTraslado}/${iniciales}`,"_blank");
 
   };
 
@@ -316,15 +322,8 @@ function RecepcionDCO() {
 
         <DialogContent>
 
-          <TextField
-            autoFocus
-            fullWidth
-            margin="dense"
-            label="Nota de Traslado"
-            type="number"
-            value={notaTraslado}
-            onChange={(e) => setNotaTraslado(e.target.value)}
-          />
+          <TextField autoFocus fullWidth margin="dense" label="Nota de Traslado" type="number" value={notaTraslado} onChange={(e) => setNotaTraslado(e.target.value)}/>
+          <TextField fullWidth margin="dense" label="Iniciales" value={iniciales} onChange={(e) => setIniciales(e.target.value.toUpperCase())}/>
 
         </DialogContent>
 
