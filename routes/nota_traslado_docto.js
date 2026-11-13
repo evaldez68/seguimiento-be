@@ -4,12 +4,8 @@ import express from 'express';
 import supabase from '../db.js';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import logoHead from "../public/LogoMiDes.png";
+import logoFoot from "../public/Pie de Pagina MiDes.png";
 
 const router = express.Router();
 
@@ -33,18 +29,13 @@ git
   }
 
   try {
-    const logoPath = path.join(__dirname, '../public/LogoMiDes.png');
-    const piePath = path.join(__dirname, '../public/Pie de Pagina MiDes.png');
-
-    const logoBase64 = fs.readFileSync(logoPath, { encoding: 'base64' });
-    const pieBase64 = fs.readFileSync(piePath, { encoding: 'base64' });
 
     const doc = new jsPDF('p', 'mm', 'letter');
     const fecha = new Date();
     const programa = data[0]?.programa || '';
     const fechaTexto = fecha.toLocaleDateString('es-GT', {day: 'numeric',month: 'long',year: 'numeric'});
 
-    doc.addImage( `data:image/png;base64,${logoBase64}`,'PNG',10,5,195,25);    
+    doc.addImage( logoHead,'PNG',10,5,195,25);    
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
     doc.text('NOTA DE TRASLADO', 105, 40, { align: 'center' });
@@ -89,7 +80,7 @@ git
       }
     });
 
-    doc.addImage(`data:image/png;base64,${pieBase64}`,'PNG',5,245,205,30);
+    doc.addImage(logoFoot,'PNG',5,245,205,30);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
 
