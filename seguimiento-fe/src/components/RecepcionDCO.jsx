@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Paper, Typography, Box, Chip, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, Select, MenuItem, Snackbar, Alert, Radio, RadioGroup, FormControlLabel, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { generarNotaTrasladoDoc } from "./NotaTrasladoDocto";
 
 function RecepcionDCO() {
 
@@ -120,7 +121,6 @@ function RecepcionDCO() {
       }
 
       setOpenNota(false);
-      //setNotaTraslado("");
 
       mostrarMensaje("Documentos actualizados correctamente", "success");
 
@@ -134,7 +134,7 @@ function RecepcionDCO() {
 
   };
 
-  const imprimirNota = () => {
+  const imprimirNota = async () => {
     console.log("Nota:", notaTraslado);
     console.log("Iniciales:", iniciales);
 
@@ -148,7 +148,7 @@ function RecepcionDCO() {
       return;
     }
 
-    window.open(`https://seguimiento-be-production-7e17.up.railway.app/nota_traslado_docto/${notaTraslado}/${iniciales}`,"_blank");
+    await generarNotaTrasladoDoc(notaTraslado,iniciales);
 
   };
 

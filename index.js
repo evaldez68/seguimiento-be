@@ -22,7 +22,6 @@ import seguimientoConsultaRouter from './routes/seguimiento_consulta.js';
 import seguimientoHistorialRouter from './routes/seguimiento_historial.js';
 import couriersRouter from './routes/couriers.js';
 import recepcionEnviosRoutes from './routes/recepcion_envios.js';
-import notaTrasladoDoctoRoutes from './routes/nota_traslado_docto.js';
 
 const app = express();
 
@@ -61,7 +60,6 @@ app.use('/seguimiento_consulta', seguimientoConsultaRouter);
 app.use('/seguimiento_historial', seguimientoHistorialRouter);
 app.use('/couriers', couriersRouter);
 app.use('/recepcion_envios', recepcionEnviosRoutes);
-app.use('/nota_traslado_docto', notaTrasladoDoctoRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
