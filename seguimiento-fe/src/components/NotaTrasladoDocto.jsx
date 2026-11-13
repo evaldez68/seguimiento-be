@@ -7,29 +7,30 @@ import logoFoot from "../assets/PiePaginaMiDes.png";
 
 export const generarNotaTrasladoDoc = async (nota, iniciales) => {
  
-//    const res = await fetch(`localhost:3000/recepcion_envios/nota/${nota}`);
     const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/nota/${nota}`);
     const data = await res.json();
+    console.log("NOTA:", nota);
+    console.log("DATA:", data);    
 
     const doc = new jsPDF('p', 'mm', 'letter');
     const fecha = new Date();
     const programa = data[0]?.programa || '';
     const fechaTexto = fecha.toLocaleDateString('es-GT', {day: 'numeric',month: 'long',year: 'numeric'});
 
-    doc.addImage( logoHead,'PNG',10,5,195,25);    
+    doc.addImage( logoHead,'PNG',10,5,80,18);    
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
     doc.text('NOTA DE TRASLADO', 105, 40, { align: 'center' });
 
     doc.setFontSize(11);
-    doc.text(`DCO-${nota}-2026/ESP/${iniciales}`, 20, 50, { align: 'center' });
+    doc.text(`DCO-${nota}-2026/ESP/${iniciales}`, 20, 50);
 
     doc.setFont('helvetica', 'normal');
 
     doc.text('De:', 20, 60);
     doc.text('Licenciado Estuardo Samayoa Prado', 35, 60);
 
-    doc.text('Director, Dirección de Coordinación y Organización', 35, 51);
+    doc.text('Director, Dirección de Coordinación y Organización', 35, 65);
 
     doc.text('Para:', 20, 78);
     doc.text('Subdirección Técnica', 35, 78);
@@ -46,22 +47,10 @@ export const generarNotaTrasladoDoc = async (nota, iniciales) => {
     autoTable(doc, {
       startY: 125,
       head: [['No.', 'PROGRAMA', 'OFICIO/MEMO', 'DESCRIPCIÓN']],
-      body: data.map((item, index) => [
-        index + 1,
-        item.programa || '',
-        item.numero_documento || '',
-        item.descripcion || ''
-      ]),
-      theme: 'grid',
-      styles: {
-        fontSize: 9
-      },
-      headStyles: {
-        fillColor: [41, 98, 255]
-      }
-    });
+      body: data.map((item, index) => [index + 1, item.programa || '', item.numero_documento || '', item.descripcion || '']),theme: 'grid',
+      styles: {fontSize: 9},headStyles: {fillColor: [149, 179, 215]}});
 
-    doc.addImage(logoFoot,'PNG',5,245,205,30);
+    doc.addImage(logoFoot,'PNG',5,245,190,23);
 
     // Descargar
   doc.save(`Nota_de_Traslado_${nota}.pdf`);
