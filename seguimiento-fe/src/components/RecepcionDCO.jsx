@@ -120,7 +120,7 @@ function RecepcionDCO() {
       }
 
       setOpenNota(false);
-      setNotaTraslado("");
+      //setNotaTraslado("");
 
       mostrarMensaje("Documentos actualizados correctamente", "success");
 
@@ -135,6 +135,8 @@ function RecepcionDCO() {
   };
 
   const imprimirNota = () => {
+    console.log("Nota:", notaTraslado);
+    console.log("Iniciales:", iniciales);
 
     if (!notaTraslado) {
       mostrarMensaje("Primero debe grabar una recepción", "warning");
@@ -292,20 +294,11 @@ function RecepcionDCO() {
 
       <Box sx={{ mt: 2 }}>
 
-        <Button
-          variant="contained"
-          color="success"
-          sx={{ mr: 2 }}
-          onClick={grabarDocumentos}
-        >
+        <Button variant="contained" color="success" sx={{ mr: 2 }} onClick={grabarDocumentos}>
           Grabar
         </Button>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={imprimirNota}
-        >
+        <Button variant="contained" color="primary" onClick={imprimirNota}>
           Imprimir Nota
         </Button>
 
@@ -323,7 +316,7 @@ function RecepcionDCO() {
         <DialogContent>
 
           <TextField autoFocus fullWidth margin="dense" label="Nota de Traslado" type="number" value={notaTraslado} onChange={(e) => setNotaTraslado(e.target.value)}/>
-          <TextField fullWidth margin="dense" label="Iniciales" value={iniciales} onChange={(e) => setIniciales(e.target.value.toUpperCase())}/>
+          <TextField           fullWidth margin="dense" label="Iniciales" value={iniciales} onChange={(e) => setIniciales(e.target.value.toUpperCase())}/>
 
         </DialogContent>
 
