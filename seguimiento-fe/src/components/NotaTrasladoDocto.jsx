@@ -63,13 +63,6 @@ export const generarNotaTrasladoDoc = async (nota, iniciales) => {
 
     doc.addImage(logoFoot,'PNG',5,245,205,30);
 
-    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition',`attachment; filename=NotaTraslado_${nota}.pdf`);
-
-    res.send(pdfBuffer);
-
     // Descargar
   doc.save(`Nota_de_Traslado_${nota}.pdf`);
 };
