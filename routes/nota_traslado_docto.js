@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/:nota/:iniciales', async (req, res) => {
 
   const { nota, iniciales } = req.params;
-
+git 
   const { data, error } = await supabase
     .from('detalle_envios')
     .select('*')
