@@ -14,6 +14,21 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
+// GET documentos únicos de un proceso
+router.get("/proceso/:idProceso", async (req, res) => {
+  const { idProceso } = req.params;
+  const { data, error } = await supabase
+    .from("seguimiento_documentos")
+    .select("id_documento")
+    .eq("id_proceso", idProceso);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  const documentos = [...new Set(data.map(x => x.id_documento))]
+    .map(id => ({ id_documento: id }));
+  res.json(documentos);
+});
+
 // POST: insertar uno o varios seguimientos con validación de secuencia
 router.post('/', async (req, res) => {
   try {

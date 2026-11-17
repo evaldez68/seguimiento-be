@@ -1,6 +1,7 @@
 // src/components/MaestroEnvioForm.jsx
 
 import React, { useState, useEffect } from "react";
+import {Box,Paper,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Button,TextField,FormControl,InputLabel,Select,MenuItem} from "@mui/material";
 
 function MaestroEnvioForm({ onGrabar, maestroInicial }) {
   const [formData, setFormData] = useState({
@@ -8,8 +9,8 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
     correlativo: "",
     tipo_entrega: "Presencial",
     no_guia: "",
-    empresa_courier: "",
-    id_courier: "",
+    empresa_courier: "Presencial", // Valor por defecto para "Presencial"
+    id_courier: "999", // Valor por defecto para "No aplica"
   });
 
   const [coordinaciones, setCoordinaciones] = useState([]);
@@ -40,8 +41,18 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
   }, [maestroInicial]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const { name, value } = e.target;
+    if (name === "tipo_entrega" && value === "Presencial") {
+      setFormData({
+        ...formData,
+        tipo_entrega: "Presencial",
+        id_courier: 999,
+        empresa_courier: "Presencial",
+        no_guia: ""});
+      return;
+    }
+    setFormData({
+    ...formData, [name]: value,});};
 
   const handleCourierChange = (e) => {
     const id = parseInt(e.target.value, 10);
@@ -61,6 +72,7 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
       fecha: fecha.toISOString().split("T")[0],
       hora: fecha.toTimeString().split(" ")[0],
     };
+
     const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/maestro_envios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -73,61 +85,38 @@ function MaestroEnvioForm({ onGrabar, maestroInicial }) {
   return (
   <div className="contenedor-principal">
     <form onSubmit={handleSubmit} className="formulario">
-      <h3>Ingreso Maestro de Envío</h3>
-
-      <label style={{ marginLeft: "5px" }}>Coordinación:</label>
-      <select
-        name="id_coordinacion"
-        value={formData.id_coordinacion}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Seleccione coordinación</option>
-        {coordinaciones.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.departamento}
-          </option>
-        ))}
-      </select>
-
-      <label style={{ marginLeft: "5px" }}>Correlativo:</label>
-      <input type="text" name="correlativo" value={formData.correlativo} readOnly />
-
-      <label style={{ marginLeft: "5px" }}>Tipo de Entrega:</label>
-      <select name="tipo_entrega" value={formData.tipo_entrega} onChange={handleChange}>
-        <option value="Presencial">Presencial</option>
-        <option value="Courier">Courier</option>
-      </select>
-        
+      <h3 style={{ textAlign: "center", color: "#1976d2" }}>
+         Ingreso Maestro de Envío
+      </h3>
+      <FormControl size="small" sx={{minWidth:300}}>
+        <InputLabel>Coordinación</InputLabel>
+        <Select name="id_coordinacion" value={formData.id_coordinacion} label="Coordinación" onChange={handleChange}>
+          {coordinaciones.map((c) => (
+          <MenuItem key={c.id} value={c.id}>{c.departamento}</MenuItem>))}
+        </Select>
+      </FormControl>
+      <TextField size="small" label="Correlativo" name="correlativo" value={formData.correlativo} InputProps={{readOnly:true}} sx={{width:150, ml:1,"& .MuiInputBase-input":{fontWeight:"bold",color:"#1976d2"}}} />
+      <FormControl size="small" sx={{minWidth:300, ml:1}}>
+        <InputLabel>Tipo de Entrega</InputLabel>
+        <Select name="tipo_entrega" value={formData.tipo_entrega} label="Tipo de Entrega" onChange={handleChange}>
+          <MenuItem value="Presencial">Presencial</MenuItem>
+          <MenuItem value="Courier">Courier</MenuItem>
+        </Select>
+      </FormControl>
       {formData.tipo_entrega === "Courier" && (
         <>
-          <label style={{ marginLeft: "5px" }}>Empresa Courier:</label>
-          <select
-            name="id_courier"
-            value={formData.id_courier}
-            onChange={handleCourierChange}
-            required
-          >
-            <option value="">Seleccione courier</option>
-            {couriers.map((c) => (
-              <option key={c.id_courier} value={c.id_courier}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-
-          <label style={{ marginLeft: "5px" }}>No. Guía:</label>
-          <input
-            type="text"
-            name="no_guia"
-            value={formData.no_guia}
-            onChange={handleChange}
-          />
-
+          <FormControl size="small" sx={{minWidth:300, ml:1}}>
+            <InputLabel>Empresa Courier</InputLabel>
+            <Select name="id_courier" value={formData.id_courier} label="Empresa Courier" onChange={handleCourierChange} required>
+              <MenuItem value="">Seleccione courier</MenuItem>
+              {couriers.map((c) => (
+                <MenuItem key={c.id_courier} value={c.id_courier}>{c.nombre}</MenuItem>))}
+            </Select>
+          </FormControl>
+          <TextField size="small" label="No. Guia" name="no_guia" value={formData.no_guia} sx={{width:150, ml:1}} />
         </>
       )}
-
-      <button style={{ marginLeft: "15px" }} type="submit" className="guardar">Grabar</button>
+      <Button type="submit" variant="contained" size="large" sx={{ml:2,borderRadius:3,px:3,textTransform:"none",fontWeight:"bold"}}>Grabar</Button>
     </form>
   </div>
   );

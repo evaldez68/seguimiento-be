@@ -1,14 +1,15 @@
 // src/components/SeguimientoEnvios.jsx
+
 import React, { useState, useEffect } from "react";
 import {
-  Grid, Table, TableBody, TableCell, TableContainer,
+  Grid, Table, TableBody, TableCell, TableContainer, Box, Typography,
   TableHead, TableRow, Paper, Checkbox, Button, TextField,
   Select, MenuItem, Snackbar, Alert
 } from "@mui/material";
 
 
 function SeguimientoEnvios() {
-  const [correlativo, setCorrelativo] = useState("");
+//  const [correlativo, setCorrelativo] = useState("");
   const [maestro, setMaestro] = useState(null);
   const [documentos, setDocumentos] = useState([]);
   const [recibidos, setRecibidos] = useState([]);
@@ -16,6 +17,9 @@ function SeguimientoEnvios() {
   const [procesos, setProcesos] = useState([]);
   const [idProcesoSeleccionado, setIdProcesoSeleccionado] = useState("");
   const usuarioLogin = JSON.parse(localStorage.getItem("usuario"));
+  const [programas, setProgramas] = useState([]);
+  const [programaSeleccionado, setProgramaSeleccionado] = useState("");
+  const [documentosOriginales, setDocumentosOriginales] = useState([]);  
 
   // Snackbar
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
@@ -45,32 +49,41 @@ function SeguimientoEnvios() {
       }
     };
     cargarProcesos();
+    }, []);
+
+  // Cargar procesos
+  useEffect(() => {
+  const cargarProgramas = async () => {
+    try {
+      const res = await fetch("https://seguimiento-be-production-7e17.up.railway.app/programas");
+      const data = await res.json();
+      setProgramas(data);
+    } catch (err) {
+      console.error("Error al cargar programas:", err);
+    }
+  };
+
+  cargarProgramas();
   }, []);
 
   // Buscar correlativo
   const buscarEnvio = async () => {
-    if (!correlativo) {
-      mostrarMensaje("Debe ingresar un correlativo ❌", "warning");
-      return;
+    if (!programaSeleccionado) {mostrarMensaje("Debe seleccionar un programa ❌", "warning");
+    return;
     }
 
     try {
-      const resMaestro = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/correlativo/${correlativo}`);
-      if (!resMaestro.ok) {
-        mostrarMensaje("El correlativo no existe ❌", "error");
-        setMaestro(null);
-        setDocumentos([]);
-        setRecibidos([]);
-        setRechazados([]);
-        return;
-      }
-      const maestroData = await resMaestro.json();
-
-      const resDocs = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/detalle_envios/correlativo/${correlativo}`);
+      const resDocs = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/recibidos/${encodeURIComponent(programaSeleccionado)}`);
       const docsData = await resDocs.json();
 
-      setMaestro(maestroData);
+      if (docsData.length === 0) {mostrarMensaje("No existen documentos recibidos para este programa ❌","warning");
+        setDocumentos([]);
+        setDocumentosOriginales([]);
+        setRecibidos([]);
+        setRechazados([]);
+        return;}
       setDocumentos(docsData);
+      setDocumentosOriginales(docsData);
       setRecibidos([]);
       setRechazados([]);
     } catch (err) {
@@ -126,8 +139,6 @@ const grabarSeguimiento = async () => {
         rechazado: rechazados.includes(doc.id),
       }));
 
-    console.log("Payload a enviar:", payload);
-
     const resp = await fetch("https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -158,17 +169,16 @@ const grabarSeguimiento = async () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Seguimiento de Envíos</h2>
-
       <Grid container spacing={2} >
         <Grid item xs={5}>
-          <TextField
-            label="Correlativo del envío"
-            variant="outlined"
-            value={correlativo}
-            onChange={(e) => setCorrelativo(e.target.value)}
-            fullWidth
-          />
+          <Select value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)} displayEmpty fullWidth>
+            <MenuItem value="">
+               <em>-- Seleccione Programa --</em>
+            </MenuItem>
+              {programas.map((p) => (<MenuItem key={p.nombre_programa} value={p.nombre_programa}> {p.nombre_programa}
+            </MenuItem>
+            ))}
+          </Select>
         </Grid>
         <Grid item xs={2}>
           <Button variant="contained" onClick={buscarEnvio} fullWidth>
@@ -178,7 +188,40 @@ const grabarSeguimiento = async () => {
         <Grid item xs={5}>
           <Select
             value={idProcesoSeleccionado}
-            onChange={(e) => setIdProcesoSeleccionado(e.target.value)}
+             onChange={async (e) => {
+               const idProceso = parseInt(e.target.value);
+               setIdProcesoSeleccionado(idProceso);
+             // Buscar proceso seleccionado
+               const procesoActual = procesos.find((p) => p.id === idProceso);
+            // Si no tiene proceso anterior, mostrar todo
+               if (!procesoActual || !procesoActual.seq_ant) {
+                 setDocumentos(documentosOriginales);
+                 return;
+               }
+            // Buscar el proceso anterior usando la secuencia
+               const procesoAnterior = procesos.find((p) => p.secuencia === procesoActual.seq_ant);
+               if (!procesoAnterior) {
+                setDocumentos([]);
+                return;
+               }
+               try {
+                // Documentos del proceso anterior
+                 const respAnterior = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoAnterior.id}`);
+                const dataAnterior = await respAnterior.json();
+                const idsAnterior = dataAnterior.map(x => x.id_documento);
+                // Documentos ya procesados en el proceso actual
+                 const respActual = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoAnterior.id}`);
+                const dataActual = await respActual.json();
+                const idsActual = dataActual.map(x => x.id_documento);
+                // Están en el anterior pero no en el actual
+                const idsPendientes = idsAnterior.filter(id => !idsActual.includes(id));
+                const docsFiltrados = documentosOriginales.filter(doc => idsPendientes.includes(doc.id));
+                setDocumentos(docsFiltrados);
+                } catch (err) {
+                  console.error(err);
+                  mostrarMensaje("Error al filtrar documentos ❌", "error");
+                }
+             }}
             displayEmpty
             fullWidth
           >
@@ -207,42 +250,43 @@ const grabarSeguimiento = async () => {
       )}
 
       {documentos.length > 0 && (
-        <TableContainer component={Paper}>
+          <Paper className="guatemala-card" sx={{ p: 3, mt: 2 }}>        
+          <Box sx={{mb: 3,pb: 2,borderBottom: "2px solid var(--guatemala-azul)"}}>
+            <Typography variant="h5" sx={{color: "var(--guatemala-azul)",fontWeight: 700}}>
+               Seguimiento de Documentos
+            </Typography>
+          </Box>
           <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Tipo de Documento</TableCell>
-                <TableCell>Número de Documento</TableCell>
-                <TableCell>Programa</TableCell>
-                <TableCell>Subprograma</TableCell>
-                <TableCell align="center">Recibido</TableCell>
-                <TableCell align="center">Rechazado</TableCell>
+            <TableHead sx={{"& th:first-of-type": {borderTopLeftRadius: "12px"},"& th:last-of-type": {borderTopRightRadius: "12px"}, 
+              "& th":{borderRight:"1px solid #D3D3D3"}, "& th:last-child":{borderRight:"none"}}}>
+              <TableRow sx={{"& td": {borderBottom: "8px solid #fff"}}}>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Tipo de Documento</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Número de Documento</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Programa</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Sub-Programa</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Recibido</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Rechazado</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {documentos.map((doc) => (
-                <TableRow key={doc.id}>
+            <TableBody sx={{"& td":{fontSize:"16px", fontWeight: 600}}}>
+              {documentos.map((doc, index) => (
+              <TableRow key={doc.id} sx={{backgroundColor:index % 2 === 0 ? "#FFFFFF" : "#F8FAFC","&:hover": {backgroundColor: "#E8F1FF"}}}>
                   <TableCell>{doc.tipo_documento}</TableCell>
                   <TableCell>{doc.numero_documento}</TableCell>
                   <TableCell>{doc.programa}</TableCell>
                   <TableCell>{doc.subprograma}</TableCell>
-                  <TableCell align="center">
-                    <Checkbox
-                      checked={recibidos.includes(doc.id)}
-                      onChange={() => toggleRecibido(doc.id)}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Checkbox
-                      checked={rechazados.includes(doc.id)}
-                      onChange={() => toggleRechazado(doc.id)}
-                    />
-                  </TableCell>
+                  <TableCell align="center"><Checkbox checked={recibidos.includes(doc.id)} onChange={() => toggleRecibido(doc.id)}/></TableCell>
+                  <TableCell align="center"><Checkbox checked={rechazados.includes(doc.id)} onChange={() => toggleRechazado(doc.id)}/></TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          <Box sx={{mt: 2, mb: 3,pb: 2, borderTop: "2px solid var(--guatemala-gris2)", borderBottom: "2px solid var(--guatemala-gris2)"}}>
+            <Typography variant="body2" align="left" sx={{fontSize:"18px", fontWeight: 600, color:"var(--guatemala-blue)", mt: 2}}>
+               Documentos pendientes para el proceso seleccionado: {documentos.length}
+            </Typography>
+          </Box>
+       </Paper>          
       )}
 
       {documentos.length > 0 && (

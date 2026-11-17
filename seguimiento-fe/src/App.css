@@ -3,9 +3,18 @@
   --guatemala-white: #FFFFFF;
   --guatemala-gray: #f0f0f0;
   --guatemala-dark: #003366;
+  --guatemala-azul: #003366;
+  --guatemala-gris2: #898989;  
+  --guatemala-gris: #F8FAFC;  
   --accent-gold: #d4af37;
   --accent-violet: #6a0dad;  
 }
+.guatemala-card {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
 
 #root {
   width: 100%;

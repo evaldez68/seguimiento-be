@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import MaestroEnvioForm from "./MaestroEnvioForm";
 import DetalleEnvioGrid from "./DetalleEnvioGrid";
 import { generarNotaTraslado } from "./NotaTrasladoPDF";
+import {Box,Paper,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Button,TextField,FormControl,InputLabel,Select,MenuItem} from "@mui/material";
 
 function EnviosProceso() {
   const [idMaestro, setIdMaestro] = useState(null);
@@ -40,7 +41,7 @@ function EnviosProceso() {
     }
 
     const resMaestro = await fetch(
-      `https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/${buscarCorrelativo}`
+      `https://seguimiento-be-production-7e17.up.railway.app/maestro_envios/correlativo/${buscarCorrelativo}`
     );
     const maestroData = await resMaestro.json();
 
@@ -64,37 +65,22 @@ function EnviosProceso() {
 
   return (
     <div className="contenedor-envios">
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Ingreso de Envíos
-      </h2>
-
+      <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#1976d2", marginTop: "10px", fontWeight:"bold" }}>Ingreso de Envíos</h2>
       {/* 🔎 Buscar arriba del formulario */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Buscar correlativo"
-          value={buscarCorrelativo}
-          onChange={(e) => setBuscarCorrelativo(e.target.value)}
-        />
-        <button onClick={handleBuscarNota} className="btn-accion">Buscar</button>
+        <TextField  size="small" label="Buscar Correlativo" name="correlativo" value={buscarCorrelativo} onChange={(e) => setBuscarCorrelativo(e.target.value)}  sx={{width:250}} />
+        <Button onClick={handleBuscarNota} variant="contained" sx={{ml:1}}>Buscar</Button>
       </div>
-
       <MaestroEnvioForm onGrabar={handleGrabarMaestro} maestroInicial={maestro} />
-
       {idMaestro && (
         <>
           <DetalleEnvioGrid idMaestro={idMaestro} onChange={setDetalle} />
           <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <button
-              onClick={() => generarNotaTraslado(maestro, detalle)}
-              className="btn-pdf"
-            >
-              Generar Nota de Traslado
-            </button>
+            <Button onClick={() => generarNotaTraslado(maestro, detalle)} variant="contained" >Generar Nota de Traslado</Button>
           </div>
           {/* 🔎 Nueva Nota solo aparece después de grabar */}
           <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <button onClick={handleNuevaNota} className="btn-accion">Nueva Nota</button>
+            <Button onClick={handleNuevaNota} variant="contained" >Nueva Nota</Button>
           </div>
         </>
       )}

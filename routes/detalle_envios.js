@@ -59,8 +59,9 @@ router.post('/', async (req, res) => {
   const { id_maestro_envio, tipo_documento, numero_documento, programa, subprograma } = req.body;
   const { data, error } = await supabase
     .from('detalle_envios')
-    .insert([{id_maestro_envio,tipo_documento,numero_documento,programa,subprograma,estado: 'P',oficio_original: numero_documento}]);
-
+    .insert([{id_maestro_envio,tipo_documento,numero_documento,programa,subprograma,estado: 'P',oficio_original: numero_documento}])
+    .select()
+    .single();
   if (error) return res.status(400).json({ error: error.message });
   res.status(201).json(data);
 });
