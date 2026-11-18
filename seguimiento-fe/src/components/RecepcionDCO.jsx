@@ -6,6 +6,7 @@ import { generarNotaTrasladoDoc } from "./NotaTrasladoDocto";
 
 function RecepcionDCO() {
 
+  const usuarioLogin = JSON.parse(localStorage.getItem("usuario"));
   const [programas, setProgramas] = useState([]);
   const [programa, setPrograma] = useState("");
   const [documentos, setDocumentos] = useState([]);
@@ -15,6 +16,12 @@ function RecepcionDCO() {
   const [mensaje, setMensaje] = useState("");
   const [severity, setSeverity] = useState("success");
   const [iniciales, setIniciales] = useState("");
+
+  const CLAVE_EDICION="DCO2026";
+  const [openEditar,setOpenEditar]=useState(false);
+  const [password,setPassword]=useState("");
+  const [nuevoNumero,setNuevoNumero]=useState("");
+  const [documentoEditar,setDocumentoEditar]=useState(null);  
 
   useEffect(() => {
     fetch("https://seguimiento-be-production-7e17.up.railway.app/programas")
@@ -60,6 +67,35 @@ function RecepcionDCO() {
         : doc
     ));};
 
+  const abrirEdicion=(doc)=>{
+    setDocumentoEditar(doc);
+    setNuevoNumero(doc.numero_documento);
+    setPassword("");
+    setOpenEditar(true);
+  };    
+
+  const guardarCambioNumero=async()=>{
+    await fetch(`https://seguimiento-be-production-7e17.up.railway.app/detalle_envios/${documentoEditar.id}`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({...documentoEditar,numero_documento:nuevoNumero})
+    });
+    await fetch("https://seguimiento-be-production-7e17.up.railway.app/bitacora_cambios",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+      tabla_modificada:"detalle_envios",
+      id_registro:documentoEditar.id,
+      campo_modificado:"numero_documento",
+      valor_anterior:documentoEditar.numero_documento,
+      valor_nuevo:nuevoNumero,
+      accion_realizada:"U",
+      usuario:usuarioLogin.nombre
+    })});
+    setOpenEditar(false);
+    buscarPendientes();
+  };  
+
   const grabarDocumentos = () => {
     const documentosMarcados = documentos.filter(doc => doc.accion === "R" || doc.accion === "N");
     if (documentosMarcados.length === 0) {
@@ -87,7 +123,20 @@ function RecepcionDCO() {
           body: JSON.stringify({
             descripcion: doc.descripcion_local,
             nota_traslado: notaTraslado
-          })});}
+          })});
+        if (doc.accion === "R") {
+          await fetch("https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos",{
+          method: "POST",
+          headers: {"Content-Type": "application/json",},
+          body: JSON.stringify([{
+            id_envio: doc.id_maestro_envio,
+            id_proceso: 9,
+            id_documento: doc.id,
+            usuario: usuarioLogin.nombre,
+            recibido: true,
+            rechazado: false,},]),});    
+        }          
+      }
       setOpenNota(false);
       mostrarMensaje("Documentos actualizados correctamente", "success");
       buscarPendientes();
@@ -154,15 +203,16 @@ function RecepcionDCO() {
         </Grid>
       </Paper>
       <Paper elevation={3}>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
+        <TableContainer component={Paper} sx={{borderRadius:3,mt:2}}>
+          <Table>
+            <TableHead sx={{"& th:first-of-type": {borderTopLeftRadius: "12px"},"& th:last-of-type": {borderTopRightRadius: "12px"}, "& th":{borderRight:"1px solid #D3D3D3"}, "& th:last-child":{borderRight:"none"}}}>
               <TableRow sx={{ backgroundColor: '#1976d2' }}>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Documento</TableCell>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Tipo</TableCell>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Estado</TableCell>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Acción</TableCell>
-                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Descripción</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Documento</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Tipo</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Estado</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Acción</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Descripción</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -179,6 +229,7 @@ function RecepcionDCO() {
                   <TableCell>
                     <TextField fullWidth size="small" value={doc.descripcion_local} onChange={(e) => cambiarDescripcion(doc.id, e.target.value)} disabled={doc.accion === ""} inputProps={{ maxLength: 150 }}/>
                   </TableCell>
+                  <TableCell align="center"><Button variant="contained" size="small" sx={{color:"white"}} onClick={()=>abrirEdicion(doc)}>Editar</Button></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -202,6 +253,17 @@ function RecepcionDCO() {
         <DialogActions>
           <Button onClick={() => setOpenNota(false)}>Cancelar</Button>
           <Button variant="contained" onClick={confirmarGrabacion}>Aceptar</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openEditar} onClose={()=>setOpenEditar(false)}>
+        <DialogTitle>Editar Número de Documento</DialogTitle>
+        <DialogContent>
+          <TextField fullWidth margin="dense" label="Contraseña" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
+          <TextField fullWidth margin="dense" label="Nuevo Número" value={nuevoNumero} disabled={password!==CLAVE_EDICION} onChange={(e)=>setNuevoNumero(e.target.value)} />
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="error" onClick={()=>setOpenEditar(false)}>Cancelar</Button>
+          <Button variant="contained" disabled={password!==CLAVE_EDICION} onClick={guardarCambioNumero}>Guardar</Button>
         </DialogActions>
       </Dialog>
       <Snackbar open={snackbar} autoHideDuration={4000} onClose={() => setSnackbar(false)}>

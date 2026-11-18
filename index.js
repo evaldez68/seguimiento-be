@@ -22,6 +22,7 @@ import seguimientoConsultaRouter from './routes/seguimiento_consulta.js';
 import seguimientoHistorialRouter from './routes/seguimiento_historial.js';
 import couriersRouter from './routes/couriers.js';
 import recepcionEnviosRoutes from './routes/recepcion_envios.js';
+import bitacoraCambiosRoutes from './routes/bitacora_cambios.js';
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use('/seguimiento_consulta', seguimientoConsultaRouter);
 app.use('/seguimiento_historial', seguimientoHistorialRouter);
 app.use('/couriers', couriersRouter);
 app.use('/recepcion_envios', recepcionEnviosRoutes);
+app.use('/bitacora_cambios', bitacoraCambiosRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

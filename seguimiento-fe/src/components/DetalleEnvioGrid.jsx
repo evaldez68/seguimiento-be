@@ -1,6 +1,6 @@
 // src/components/DetalleEnvioGrid.jsx
 import React, { useState, useEffect } from "react";
-import {Box,Paper,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Button,TextField,FormControl,InputLabel,Select,MenuItem} from "@mui/material";
+import {Box,Paper,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Button,TextField,FormControl,InputLabel,Select,MenuItem,Dialog,DialogTitle,DialogContent,DialogActions} from "@mui/material";
 
 function DetalleEnvioGrid({ idMaestro, onChange }) {
   const usuarioLogin = JSON.parse(localStorage.getItem("usuario"));
@@ -13,6 +13,43 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
     programa: "",
     subprograma: "",
   });
+  const CLAVE_EDICION="dco2026";
+  const [dialogOpen,setDialogOpen]=useState(false);
+  const [documentoEditar,setDocumentoEditar]=useState(null);
+  const [password,setPassword]=useState("");
+  const [nuevoNumero,setNuevoNumero]=useState("");
+
+  const abrirEdicion=(d)=>{
+    setDocumentoEditar(d);
+    setNuevoNumero(d.numero_documento);
+    setPassword("");
+    setDialogOpen(true);
+  };
+
+  const guardarCambioNumero=async()=>{
+  if(password!==CLAVE_EDICION) return alert("Contraseña incorrecta");
+  await fetch(`https://seguimiento-be-production-7e17.up.railway.app/detalle_envios/${documentoEditar.id}`,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({...documentoEditar,numero_documento:nuevoNumero})
+  });
+  await fetch("https://seguimiento-be-production-7e17.up.railway.app/bitacora_cambios",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      tabla_modificada:"detalle_envios",
+      id_registro:documentoEditar.id,
+      campo_modificado:"numero_documento",
+      valor_anterior:documentoEditar.numero_documento,
+      valor_nuevo:nuevoNumero,
+      accion_realizada:"U",
+      usuario:usuarioLogin.nombre
+    })
+  });
+
+  setDialogOpen(false);
+  cargarDetalle();
+};
 
   useEffect(() => {
     fetch("https://seguimiento-be-production-7e17.up.railway.app/programas")
@@ -59,7 +96,6 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
     body: JSON.stringify(payload),});
     const detalleGrabado = await respDetalle.json();    
 
-    console.log("Detalle grabado:", detalleGrabado);
     await fetch("https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos",{
     method: "POST",
     headers: {"Content-Type": "application/json",},
@@ -89,6 +125,7 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
             <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Número Documento</TableCell>
             <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Programa</TableCell>
             <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Subprograma</TableCell>
+            <TableCell sx={{ backgroundColor:"#1976d2", color:"white", fontWeight:"bold" }} align="center">Acciones</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -98,6 +135,7 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
               <TableCell style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{d.numero_documento}</TableCell>
               <TableCell style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{d.programa}</TableCell>
               <TableCell style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{d.subprograma}</TableCell>
+              <TableCell align="center"><Button size="small" variant="contained" sx={{color:"white"}} onClick={()=>abrirEdicion(d)}>Editar</Button></TableCell>              
             </TableRow>
           ))}
         </TableBody>
@@ -135,6 +173,17 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
           Agregar
         </Button>
       </div>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Editar Número de Documento</DialogTitle>
+        <DialogContent>
+          <TextField fullWidth margin="normal" label="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+          <TextField fullWidth margin="dense" label="Nuevo Número" value={nuevoNumero} disabled={password!==CLAVE_EDICION} onChange={(e)=>setNuevoNumero(e.target.value)}/>
+        </DialogContent>
+        <DialogActions>
+          <Button sx={{color:"white"}} onClick={()=>setDialogOpen(false)}>Cancelar</Button>
+          <Button variant="contained" disabled={password!==CLAVE_EDICION} onClick={guardarCambioNumero}>Guardar</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
