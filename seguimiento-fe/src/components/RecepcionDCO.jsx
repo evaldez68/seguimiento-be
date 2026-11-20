@@ -41,8 +41,7 @@ function RecepcionDCO() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:3000/recepcion_envios/pendientes/${programa}`);
-//      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/pendientes/${programa}`);
+      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/pendientes/${programa}`);
       const data = await res.json();
       const registros = (data || []).map(doc => ({
         ...doc,
