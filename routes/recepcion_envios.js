@@ -68,6 +68,7 @@ router.get('/nota/:nota_traslado', async (req, res) => {
     .from('detalle_envios')
     .select('*')
     .eq('nota_traslado', nota_traslado)
+    .eq('estado', 'R')
     .order('numero_documento', { ascending: true });
 
   if (error) {
