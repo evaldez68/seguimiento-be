@@ -15,17 +15,6 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-router.get('/documento/:numero', async (req, res) => {
-  const { numero } = req.params;
-  const { data, error } = await supabase
-    .from('seguimiento_documentos_vw')
-    .select('*')
-    .eq('numero_documento', numero);
-
-  if (error) return res.status(400).json({ error });
-  res.json(data);
-});
-
 // GET por número de documento
 router.get('/documento/:numero', async (req, res) => {
   const { numero } = req.params;
@@ -45,6 +34,21 @@ router.get('/correlativo/:coti', async (req, res) => {
     .from('seguimiento_documentos_vw')
     .select('*')
     .eq('correlativo', coti);
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+// GET por programa
+router.get('/programa/:programa', async (req, res) => {
+  const { programa } = req.params;
+  const { data, error } = await supabase
+    .from('vw_movimientos_documentos')
+    .select('*')
+    .eq('programa', programa)
+    .order('numero_documento', { ascending: true })
+    .order('fecha_proceso', { ascending: true });
+;
 
   if (error) return res.status(400).json({ error });
   res.json(data);

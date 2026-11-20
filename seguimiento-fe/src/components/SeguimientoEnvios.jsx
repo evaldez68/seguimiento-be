@@ -51,7 +51,7 @@ function SeguimientoEnvios() {
     cargarProcesos();
     }, []);
 
-  // Cargar procesos
+  // Cargar programas
   useEffect(() => {
   const cargarProgramas = async () => {
     try {
@@ -206,11 +206,11 @@ const grabarSeguimiento = async () => {
                }
                try {
                 // Documentos del proceso anterior
-                 const respAnterior = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoAnterior.id}`);
+                const respAnterior = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoAnterior.id}`);
                 const dataAnterior = await respAnterior.json();
                 const idsAnterior = dataAnterior.map(x => x.id_documento);
                 // Documentos ya procesados en el proceso actual
-                 const respActual = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoAnterior.id}`);
+                const respActual = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/seguimiento_documentos/proceso/${procesoActual.id}`);
                 const dataActual = await respActual.json();
                 const idsActual = dataActual.map(x => x.id_documento);
                 // Están en el anterior pero no en el actual
@@ -262,8 +262,9 @@ const grabarSeguimiento = async () => {
               <TableRow sx={{"& td": {borderBottom: "8px solid #fff"}}}>
                 <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Tipo de Documento</TableCell>
                 <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Número de Documento</TableCell>
-                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Programa</TableCell>
-                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Sub-Programa</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Origen</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Fecha</TableCell>
+                <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Hora</TableCell>
                 <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Recibido</TableCell>
                 <TableCell sx={{ color: "#FFF", fontWeight: 700 }} align="center">Rechazado</TableCell>
               </TableRow>
@@ -273,8 +274,9 @@ const grabarSeguimiento = async () => {
               <TableRow key={doc.id} sx={{backgroundColor:index % 2 === 0 ? "#FFFFFF" : "#F8FAFC","&:hover": {backgroundColor: "#E8F1FF"}}}>
                   <TableCell>{doc.tipo_documento}</TableCell>
                   <TableCell>{doc.numero_documento}</TableCell>
-                  <TableCell>{doc.programa}</TableCell>
-                  <TableCell>{doc.subprograma}</TableCell>
+                  <TableCell>{doc.departamento_origen}</TableCell>
+                  <TableCell align="center">{doc.fecha_proceso}</TableCell>
+                  <TableCell align="center">{doc.hora_proceso}</TableCell>
                   <TableCell align="center"><Checkbox checked={recibidos.includes(doc.id)} onChange={() => toggleRecibido(doc.id)}/></TableCell>
                   <TableCell align="center"><Checkbox checked={rechazados.includes(doc.id)} onChange={() => toggleRechazado(doc.id)}/></TableCell>
                 </TableRow>

@@ -41,7 +41,8 @@ function RecepcionDCO() {
       return;
     }
     try {
-      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/pendientes/${programa}`);
+      const res = await fetch(`http://localhost:3000/recepcion_envios/pendientes/${programa}`);
+//      const res = await fetch(`https://seguimiento-be-production-7e17.up.railway.app/recepcion_envios/pendientes/${programa}`);
       const data = await res.json();
       const registros = (data || []).map(doc => ({
         ...doc,
@@ -210,6 +211,10 @@ function RecepcionDCO() {
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Documento</TableCell>
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Tipo</TableCell>
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Estado</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Fecha</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Hora</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Origen</TableCell>
+                <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Correlativo</TableCell>
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Acción</TableCell>
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Descripción</TableCell>
                 <TableCell sx={{backgroundColor:"#1976d2",color:"white",fontWeight:"bold"}} align="center">Acciones</TableCell>
@@ -220,8 +225,12 @@ function RecepcionDCO() {
                 <TableRow key={doc.id} hover>
                   <TableCell>{doc.numero_documento}</TableCell>
                   <TableCell>{doc.tipo_documento}</TableCell>
-                  <TableCell><Chip size="small" color={obtenerColorEstado(doc.estado)} label={obtenerTextoEstado(doc.estado)}/></TableCell>
-                  <TableCell>
+                  <TableCell align="center"><Chip size="small" color={obtenerColorEstado(doc.estado)} label={obtenerTextoEstado(doc.estado)}/></TableCell>
+                  <TableCell align="center">{doc.fecha_proceso}</TableCell>
+                  <TableCell align="center">{doc.hora_proceso}</TableCell>
+                  <TableCell align="center">{doc.departamento_origen}</TableCell>
+                  <TableCell align="center">{doc.correlativo}</TableCell>
+                  <TableCell align="center">
                     <RadioGroup row value={doc.accion} onChange={(e) => cambiarAccion(doc.id, e.target.value)}>
                       <FormControlLabel value="R" control={<Radio />} label="Recibido" />
                       <FormControlLabel value="N" control={<Radio />} label="Rechazado" />

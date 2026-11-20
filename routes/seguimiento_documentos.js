@@ -29,6 +29,25 @@ router.get("/proceso/:idProceso", async (req, res) => {
   res.json(documentos);
 });
 
+// GET: recibidos por programa
+router.get('/recibidos/:programa', async (req, res) => {
+  const { programa } = req.params;
+
+  const { data, error } = await supabase
+    .from('vw_movimientos_documentos')
+    .select('*')
+    .eq('programa', programa)
+    .eq('estado', 'R')
+    .gt('proceso', 8)
+    .order('numero_documento', { ascending: true });
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json(data);
+});
+
 // POST: insertar uno o varios seguimientos con validación de secuencia
 router.post('/', async (req, res) => {
   try {

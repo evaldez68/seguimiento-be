@@ -33,7 +33,7 @@ function DetalleEnvioGrid({ idMaestro, onChange }) {
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({...documentoEditar,numero_documento:nuevoNumero})
   });
-  await fetch("https://seguimiento-be-production-7e17.up.railway.app/bitacora_cambios",{
+  await fetch(`https://seguimiento-be-production-7e17.up.railway.app/bitacora_cambios`,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({

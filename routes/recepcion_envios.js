@@ -28,7 +28,7 @@ router.get('/pendientes/:programa', async (req, res) => {
   const { programa } = req.params;
 
   const { data, error } = await supabase
-    .from('detalle_envios')
+    .from('vw_movimientos_documentos')
     .select('*')
     .eq('programa', programa)
     .eq('estado', 'P')
@@ -46,10 +46,11 @@ router.get('/recibidos/:programa', async (req, res) => {
   const { programa } = req.params;
 
   const { data, error } = await supabase
-    .from('detalle_envios')
+    .from('vw_movimientos_documentos')
     .select('*')
     .eq('programa', programa)
     .eq('estado', 'R')
+    .gt('proceso', 8)
     .order('numero_documento', { ascending: true });
 
   if (error) {
